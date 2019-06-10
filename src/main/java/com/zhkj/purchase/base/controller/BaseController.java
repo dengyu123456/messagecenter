@@ -12,7 +12,7 @@ import com.zhkj.purchase.base.PageBean;
 import com.zhkj.purchase.base.request.Request;
 import com.zhkj.purchase.common.utils.MD5Util;
 
-import com.zhkj.purchase.system.domain.SystemUser;
+//import com.zhkj.purchase.system.domain.SystemUser;
 import org.apache.shiro.SecurityUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,14 +60,14 @@ public abstract class BaseController {
         }
     }
 
-    /**
-     * 通过shiro获取当前登录用户
-     *
-     * @return
-     */
-    public SystemUser getUser() {
-        return (SystemUser) SecurityUtils.getSubject().getPrincipal();
-    }
+//    /**
+//     * 通过shiro获取当前登录用户
+//     *
+//     * @return
+//     */
+//    public SystemUser getUser() {
+//        return (SystemUser) SecurityUtils.getSubject().getPrincipal();
+//    }
 
     public PageBean getPage(Request reqOb) {
         PageBean pageBean = new PageBean();

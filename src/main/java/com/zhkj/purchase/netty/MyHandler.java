@@ -43,9 +43,10 @@ public class MyHandler extends SimpleChannelInboundHandler<Object> {
         ctx.close();
     }
 
-//    @Override
-    public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+  @Override
+    public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
        // super.close(ctx, promise);
+        super.handlerRemoved(ctx);
         System.out.println("delete : id = " + this.sessionId + " table = " + this.table);
         //关闭连接将移除该用户消息
         InformationOperateMap.delete(this.sessionId, this.table);
