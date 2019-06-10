@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.purchase.mallpurchplan.dao.MallPurchPlanMapper">
+    <resultMap id="BaseResultMap" type="com.zhkj.purchase.mallpurchplan.domain.MallPurchPlan">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="mppl_uuid" jdbcType="BIGINT" property="mpplUuid"/>
+        <result column="mppl_no_number" jdbcType="VARCHAR" property="mpplNoNumber"/>
+        <result column="mppl_repe_uuid" jdbcType="BIGINT" property="mpplRepeUuid"/>
+        <result column="mppl_ente_uuid" jdbcType="BIGINT" property="mpplEnteUuid"/>
+        <result column="mppl_purch_type" jdbcType="BIT" property="mpplPurchType"/>
+        <result column="mppl_supp_uuid" jdbcType="BIGINT" property="mpplSuppUuid"/>
+        <result column="mppl_buy_uuid" jdbcType="BIGINT" property="mpplBuyUuid"/>
+        <result column="mppl_collect_price" jdbcType="DECIMAL" property="mpplCollectPrice"/>
+        <result column="mppl_lead_time" jdbcType="DATE" property="mpplLeadTime"/>
+        <result column="mppl_count" jdbcType="INTEGER" property="mpplCount"/>
+        <result column="mppl_collect_count" jdbcType="INTEGER" property="mpplCollectCount"/>
+        <result column="mppl_print_count" jdbcType="INTEGER" property="mpplPrintCount"/>
+        <result column="mppl_status" jdbcType="BIT" property="mpplStatus"/>
+        <result column="mppl_data_status" jdbcType="BIT" property="mpplDataStatus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+
+    <resultMap id="SearchResultMap" type="com.zhkj.purchase.mallpurchplan.domain.SearchMallPurchPlan">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="mppl_uuid" jdbcType="BIGINT" property="mpplUuid"/>
+        <result column="mppl_no_number" jdbcType="VARCHAR" property="mpplNoNumber"/>
+        <result column="mppl_repe_uuid" jdbcType="BIGINT" property="mpplRepeUuid"/>
+        <result column="mppl_ente_uuid" jdbcType="BIGINT" property="mpplEnteUuid"/>
+        <result column="mppl_purch_type" jdbcType="BIT" property="mpplPurchType"/>
+        <result column="mppl_supp_uuid" jdbcType="BIGINT" property="mpplSuppUuid"/>
+        <result column="mppl_supp_name" jdbcType="VARCHAR" property="mpplSuppName"/>
+        <result column="mppl_buy_uuid" jdbcType="BIGINT" property="mpplBuyUuid"/>
+        <result column="mppl_buy_name" jdbcType="VARCHAR" property="mpplBuyName"/>
+        <result column="mppl_collect_price" jdbcType="DECIMAL" property="mpplCollectPrice"/>
+        <result column="mppl_lead_time" jdbcType="DATE" property="mpplLeadTime"/>
+        <result column="mppl_count" jdbcType="INTEGER" property="mpplCount"/>
+        <result column="mppl_collect_count" jdbcType="INTEGER" property="mpplCollectCount"/>
+        <result column="mppl_print_count" jdbcType="INTEGER" property="mpplPrintCount"/>
+        <result column="mppl_status" jdbcType="BIT" property="mpplStatus"/>
+        <result column="mppl_data_status" jdbcType="BIT" property="mpplDataStatus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="mpps_sure_status" jdbcType="BIT" property="mppsSureStatus"/>
+        <result column="supp_admin" jdbcType="VARCHAR" property="suppAdmin"/>
+        <result column="supp_phone" jdbcType="VARCHAR" property="suppPhone"/>
+    </resultMap>
+
+    <select id="search" parameterType="com.zhkj.purchase.mallpurchplan.domain.request.SearchPurchPlanParams"
+            resultMap="SearchResultMap">
+        SELECT
+        DISTINCT
+        suse.suse_user_name AS mppl_buy_name
+        ,supp.supp_name AS mppl_supp_name
+        ,supp.supp_admin AS supp_admin
+        ,supp.supp_phone AS supp_phone
+        ,mpps.mpps_sure_status AS mpps_sure_status
+        ,mppl.*
+        FROM mall_purch_plan mppl
+        LEFT JOIN system_user suse ON mppl.mppl_buy_uuid=suse.suse_uuid
+        LEFT JOIN supplier supp ON mppl.mppl_supp_uuid = supp.supp_uuid
+        LEFT JOIN mall_purch_plan_sure mpps ON mpps.mpps_mppl_uuid=mppl.mppl_uuid
+        WHERE mppl.mppl_data_status = 0
+        AND mppl.mppl_buy_uuid = #{mpplBuyUuid}
+        AND mppl.mppl_status = 0
+        <if test="mpplSuppName != null and mpplSuppName != ''">
+            AND supp.supp_name LIKE CONCAT('%',#{mpplSuppName},'%')
+        </if>
+        <if test="mpplNoNumber != null and mpplNoNumber!=''">
+            OR mppl.mppl_no_number LIKE CONCAT('%',#{mpplNoNumber},'%')
+        </if>
+        <if test="mpplEnteUuid != null">
+            AND mppl.mppl_ente_uuid = #{mpplEnteUuid}
+        </if>
+        <if test="mpplLeadTime != null ">
+            AND mppl.mppl_lead_time = #{mpplLeadTime}
+        </if>
+        <if test="mppsSureStatus != null">
+        <!--<foreach collection=""  item="" open="(" separator="," close=")"/>-->
+            AND mpps.mpps_sure_status = #{mppsSureStatus}
+        </if>
+        <if test="mpplStatus != null">
+            AND mppl.mppl_status = #{mpplStatus}
+        </if>
+        ORDER BY mppl.create_time DESC
+    </select>
+
+    <select id="selectCollectCount" parameterType="java.lang.Long" resultType="com.zhkj.purchase.mallpurchplan.domain.MallCollectCount">
+       SELECT
+	   SUM(T.mppd_purch_number ) AS mppd_purch_number,
+	   SUM(T.mppd_number ) AS mppd_number
+       FROM
+	   (
+        SELECT
+	    SUM( mppd.mppd_purch_number ) AS mppd_purch_number,
+	    SUM( mppd.mppd_number ) AS mppd_number
+        FROM
+	    mall_purch_plan mppl
+	    LEFT JOIN mall_purch_plan_details mppd ON mppd.mppd_mppl_uuid = mppl.mppl_uuid
+        WHERE
+	    mppl.mppl_data_status = 0
+	    AND mppd.mppd_mppl_uuid = #{mpplUuid}
+	    ) AS T
+    </select>
+
+    <select id="sumPPTNumber" resultType="java.lang.Integer" parameterType="com.zhkj.purchase.sum.domain.request.SumPPTNParams">
+        SELECT COUNT(mppl.mppl_uuid) AS num FROM mall_purch_plan mppl WHERE
+        mppl.mppl_lead_time=#{sumTime}
+        <if test="mallUuid != null">
+            AND mppl.mppl_mall_uuid=#{mallUuid}
+        </if>
+        AND mppl.mppl_data_status=0
+    </select>
+
+    <resultMap id="DetailsResultMap" type="com.zhkj.purchase.mallpurchplan.domain.ResultPurchPlanDetails">
+        <result column="mppd_good_uuid" jdbcType="BIGINT" property="mppdGoodUuid"/>
+        <result column="mppd_good_name" jdbcType="VARCHAR" property="mppdGoodName"/>
+        <result column="mppd_purch_number" jdbcType="DECIMAL" property="mppdPurchNumber"/>
+        <result column="mppd_unit" jdbcType="VARCHAR" property="mppdUnit"/>
+        <result column="mppd_spec" jdbcType="INTEGER" property="mppdSpec"/>
+        <result column="mppd_number" jdbcType="DECIMAL" property="mppdNumber"/>
+        <result column="mppd_unit_price" jdbcType="DECIMAL" property="mppdUnitPrice"/>
+        <result column="mppd_uuid" jdbcType="BIGINT" property="mppdUuid"/>
+        <result column="mppd_remark" jdbcType="VARCHAR" property="mppdRemark"/>
+        <result column="mppd_base_unit" jdbcType="VARCHAR" property="mppdBaseUnit"/>
+        <result column="mpps_sure_status" jdbcType="BIT" property="mppsSureStatus"/>
+        <result column="mpps_type" jdbcType="BIT" property="mppsType"/>
+        <result column="mppm_message_number" jdbcType="BIGINT" property="mppmMessageNumber"/>
+    </resultMap>
+
+    <select id="selectMallPlanDetails" parameterType="com.zhkj.purchase.mallpurchplan.domain.request.DesPurchPlanParams" resultMap="DetailsResultMap">
+        SELECT
+        mppd.mppd_good_uuid AS mppd_good_uuid
+        ,mppd.mppd_good_name AS mppd_good_name
+        ,mppd.mppd_purch_number AS mppd_purch_number
+        ,mppd.mppd_unit AS mppd_unit
+        ,mppd.mppd_spec AS mppd_spec
+        ,mppd.mppd_number AS mppd_number
+        ,mppd.mppd_base_unit AS mppd_base_unit
+        ,mppd.mppd_unit_price AS mppd_unit_price
+        ,mppd.mppd_uuid AS mppd_uuid
+        ,mppd.mppd_remark AS mppd_remark
+        ,mpps.mpps_sure_status AS mpps_sure_status
+        ,mpps.mpps_type AS mpps_type
+        ,mppm.mppm_message_number AS mppm_message_number
+        FROM
+        mall_purch_plan mppl
+        LEFT JOIN mall_purch_plan_details mppd ON mppd.mppd_mppl_uuid = mppl.mppl_uuid
+        LEFT JOIN mall_purch_plan_sure mpps ON mppd.mppd_uuid=mpps_mppd_uuid
+        LEFT JOIN mall_purch_plan_message mppm ON mppm.mppm_mppd_uuid=mppd.mppd_uuid
+        WHERE
+        mppl.mppl_data_status = 0
+        AND mppd.mppd_mppl_uuid = #{mpplUuid}
+        <if test="mppdGoodName != null and mppdGoodName != ''">
+            AND mppd.mppd_good_name LIKE CONCAT('%',#{mppdGoodName},'%')
+        </if>
+        <if test="mpplEnteUuid != null">
+            AND mppl.mppl_ente_uuid=#{mpplEnteUuid}
+        </if>
+        GROUP BY mppd.mppd_good_uuid,mppd.mppd_unit_uuid
+    </select>
+</mapper>

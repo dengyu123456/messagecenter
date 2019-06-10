@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.purchase.mallpurchplan.dao.MallPurchPlanSureMapper">
+    <resultMap id="BaseResultMap" type="com.zhkj.purchase.mallpurchplan.domain.MallPurchPlanSure">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="mpps_uuid" jdbcType="BIGINT" property="mppsUuid"/>
+        <result column="mpps_mppl_uuid" jdbcType="BIGINT" property="mppsMpplUuid"/>
+        <result column="mpps_mppl_buy_uuid" jdbcType="BIGINT" property="mppsMpplBuyUuid"/>
+        <result column="mpps_sure_time" jdbcType="TIMESTAMP" property="mppsSureTime"/>
+        <result column="mpps_sure_status" jdbcType="BIT" property="mppsSureStatus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="mpps_mppd_uuid" jdbcType="BIGINT" property="mppsMppdUuid"/>
+        <result column="mpps_type" jdbcType="BIT" property="mppsType"/>
+    </resultMap>
+    <select id="selectMallPurchPlanSureDes" parameterType="java.lang.Long"
+            resultType="com.zhkj.purchase.mallpurchplan.domain.MallPurchPlanSureDes">
+    SELECT
+	mppd.mppd_good_uuid AS mppd_good_uuid
+	,mppd.mppd_good_name AS mppd_good_name
+	,mppd.mppd_purch_number AS mppd_purch_number
+	,mppd.mppd_unit AS mppd_unit
+	,mppd.mppd_spec AS mppd_spec
+	,mppd.mppd_number AS mppd_number
+	,mppd.mppd_unit_price AS mppd_unit_price
+	,mppd.mppd_uuid AS mppd_uuid
+	,mppm.mppm_sure_number AS mppm_sure_number
+	,mppl.mppl_no_number AS mppl_no_number
+	,mpps.mpps_type AS mpps_type
+    FROM
+	mall_purch_plan mppl
+	LEFT JOIN mall_purch_plan_details mppd ON mppd.mppd_mppl_uuid = mppl.mppl_uuid
+	LEFT JOIN mall_purch_plan_message mppm ON mppl.mppl_uuid = mppm.mppm_mppl_uuid
+	LEFT JOIN mall_purch_plan_sure mpps ON mpps.mpps_mppd_uuid = mppd.mppd_uuid
+	LEFT JOIN supplier supp ON mppl.mppl_supp_uuid = supp.supp_uuid
+    WHERE
+	mppl.mppl_data_status = 0
+ 	AND mpps_sure_status=1
+    AND mpps.mpps_mppl_buy_uuid=#{mppsMpplBuyUuid}
+	AND mppl.mppl_uuid = #{mpplUuid}
+	ORDER BY mpps_sure_time DESC
+  </select>
+
+    <select id="selectMallPurchPlanSureList" parameterType="java.lang.Long"
+            resultType="com.zhkj.purchase.mallpurchplan.domain.MallPurchPlanSureGroup">
+        SELECT
+        mppl.mppl_uuid AS mppl_uuid
+        ,mppl.mppl_no_number AS mppl_no_number
+        ,mppl.mppl_lead_time AS mppl_lead_time
+        ,supp.supp_name AS supp_name
+        ,supp.supp_phone AS supp_phone
+        ,supp.supp_admin AS supp_admin
+        ,COUNT(mppd_good_uuid) AS type_sum
+        ,SUM(mppd_number) AS mppd_number_sum
+        FROM
+        mall_purch_plan mppl
+        LEFT JOIN mall_purch_plan_details mppd ON mppd.mppd_mppl_uuid = mppl.mppl_uuid
+        LEFT JOIN mall_purch_plan_message mppm ON mppl.mppl_uuid = mppm.mppm_mppl_uuid
+        LEFT JOIN mall_purch_plan_sure mpps ON mpps.mpps_mppd_uuid = mppd.mppd_uuid
+        LEFT JOIN supplier supp ON mppl.mppl_supp_uuid = supp.supp_uuid
+        WHERE
+        mppl.mppl_data_status = 0
+        AND mpps_sure_status=1
+        AND mpps.mpps_mppl_buy_uuid=#{mppsMpplBuyUuid}
+        GROUP BY
+        mppl.mppl_no_number
+        ORDER BY
+        mpps_sure_time DESC
+	</select>
+    <select id="selectMallPurchPlanReceivedList"
+            parameterType="com.zhkj.purchase.mallpurchplan.domain.request.SearchReceivedParams"
+            resultType="com.zhkj.purchase.mallpurchplan.domain.MallPurchPlanReceivedGroup">
+        SELECT
+         mppl.mppl_uuid AS mppl_uuid
+        ,mppl.mppl_no_number AS mppl_no_number
+        ,supp.supp_name AS supp_name
+        ,supp.supp_phone AS supp_phone
+        ,supp.supp_admin AS supp_admin
+        ,mppl.mppl_status AS mppl_status
+        ,mppl.mppl_lead_time AS mppl_lead_time
+        ,rent.rent_status AS rent_status
+        ,reol.reol_remarks AS reol_remarks
+        FROM
+        mall_purch_plan mppl
+        LEFT JOIN supplier supp ON mppl.mppl_supp_uuid = supp.supp_uuid
+        LEFT JOIN mall_purch_plan_enter mppe ON mppe.mppe_mppl_uuid=mppl.mppl_uuid
+        LEFT JOIN repertory_enter rent ON mppe.mppe_rent_uuid=rent.rent_uuid
+        LEFT JOIN repertory_enter_operate_log reol ON reol.reol_cent_uuid=rent.rent_uuid
+        WHERE
+        mppl.mppl_data_status = 0
+        AND (mppl.mppl_status=1 OR mppl.mppl_status=2)
+        AND mppl.mppl_buy_uuid = #{mpplBuyUuid}
+        <if test="mpplLeadStartTime != null">
+            AND mppl.mppl_lead_time >= #{mpplLeadStartTime}
+        </if>
+        <if test="mpplLeadEndTime != null">
+            AND mppl.mppl_lead_time &lt; #{mpplLeadEndTime}
+        </if>
+        <if test="rentStatus != null">
+            AND rent.rent_status =#{rentStatus}
+        </if>
+        ORDER BY mppl.mppl_lead_time
+    </select>
+    <resultMap id="DetailsResultMap" type="com.zhkj.purchase.mallpurchplan.domain.ResultReceivedDetails">
+        <result column="mppd_good_uuid" jdbcType="BIGINT" property="mppdGoodUuid"/>
+        <result column="mppd_good_name" jdbcType="VARCHAR" property="mppdGoodName"/>
+        <result column="mppd_purch_number" jdbcType="DECIMAL" property="mppdPurchNumber"/>
+        <result column="mppd_unit" jdbcType="VARCHAR" property="mppdUnit"/>
+        <result column="mppd_spec" jdbcType="INTEGER" property="mppdSpec"/>
+        <result column="mppd_number" jdbcType="DECIMAL" property="mppdNumber"/>
+        <result column="mppd_unit_price" jdbcType="DECIMAL" property="mppdUnitPrice"/>
+        <result column="mppd_uuid" jdbcType="BIGINT" property="mppdUuid"/>
+        <result column="mppd_remark" jdbcType="VARCHAR" property="mppdRemark"/>
+        <result column="mppd_base_unit" jdbcType="VARCHAR" property="mppdBaseUnit"/>
+        <result column="mpps_sure_status" jdbcType="BIT" property="mppsSureStatus"/>
+        <result column="mpps_type" jdbcType="BIT" property="mppsType"/>
+    </resultMap>
+
+    <select id="selectDes" parameterType="java.lang.Long" resultMap="DetailsResultMap">
+     SELECT
+     mppd.mppd_good_uuid AS mppd_good_uuid
+     ,mppd.mppd_good_name AS mppd_good_name
+     ,mppd.mppd_purch_number AS mppd_purch_number
+     ,mppd.mppd_unit AS mppd_unit
+     ,mppd.mppd_spec AS mppd_spec
+     ,mppd.mppd_number AS mppd_number
+     ,mppd.mppd_base_unit AS mppd_base_unit
+     ,mppd.mppd_unit_price AS mppd_unit_price
+     ,mppd.mppd_uuid AS mppd_uuid
+     ,mppd.mppd_remark AS mppd_remark
+     ,mpps.mpps_sure_status AS mpps_sure_status
+     ,mpps.mpps_type AS mpps_type
+     FROM
+     mall_purch_plan mppl
+     LEFT JOIN mall_purch_plan_details mppd ON mppd.mppd_mppl_uuid = mppl.mppl_uuid
+     LEFT JOIN mall_purch_plan_sure mpps ON mppd.mppd_uuid=mpps_mppd_uuid
+     WHERE
+     mppl.mppl_data_status = 0
+     AND mppd.mppd_mppl_uuid = #{mpplUuid}
+     GROUP BY mppd.mppd_good_uuid,mppd.mppd_unit_uuid
+    </select>
+
+
+    <select id="selectMallPurchPlanList" parameterType="java.lang.Long"
+            resultType="com.zhkj.purchase.mallpurchplan.domain.MallPurchPlanSureGroup">
+      SELECT
+      mppl.mppl_uuid AS mppl_uuid
+      ,mppl.mppl_no_number AS mppl_no_number
+      ,supp.supp_name AS supp_name
+      ,supp.supp_phone AS supp_phone
+      ,supp.supp_admin AS supp_admin
+      ,mppl.mppl_lead_time AS mppl_lead_time
+      ,COUNT(mppd_good_uuid) AS type_sum
+      ,SUM(mppd_number) AS mppd_number_sum
+      FROM
+      mall_purch_plan mppl
+      LEFT JOIN mall_purch_plan_details mppd ON mppd.mppd_mppl_uuid = mppl.mppl_uuid
+      LEFT JOIN mall_purch_plan_sure mpps ON mpps.mpps_mppd_uuid = mppd.mppd_uuid
+      LEFT JOIN supplier supp ON mppl.mppl_supp_uuid = supp.supp_uuid
+      WHERE
+      mppl.mppl_data_status = 0
+      AND ISNULL(mpps.mpps_sure_status)
+      AND mppl.mppl_buy_uuid=#{mpplMpplBuyUuid}
+      GROUP BY
+      mppl.mppl_no_number
+      ORDER BY
+      mppl.mppl_lead_time DESC
+    </select>
+
+    <resultMap id="resultSearchMallPurchPlanDes"
+               type="com.zhkj.purchase.mallpurchplan.domain.ResultWaitingPurchPlanDes">
+        <result column="mppd_good_uuid" jdbcType="BIGINT" property="mppdGoodUuid"/>
+        <result column="mppd_good_name" jdbcType="VARCHAR" property="mppdGoodName"/>
+        <result column="mppd_purch_number" jdbcType="DECIMAL" property="mppdPurchNumber"/>
+        <result column="mppd_unit" jdbcType="VARCHAR" property="mppdUnit"/>
+        <result column="mppd_spec" jdbcType="INTEGER" property="mppdSpec"/>
+        <result column="mppd_number" jdbcType="DECIMAL" property="mppdNumber"/>
+        <result column="mppd_unit_price" jdbcType="DECIMAL" property="mppdUnitPrice"/>
+        <result column="mppd_uuid" jdbcType="BIGINT" property="mppdUuid"/>
+    </resultMap>
+
+    <select id="selectMallPurchPlanDes" parameterType="java.lang.Long" resultMap="resultSearchMallPurchPlanDes">
+      SELECT
+      mppd.mppd_good_uuid AS mppd_good_uuid
+      ,mppd.mppd_good_name AS mppd_good_name
+      ,mppd.mppd_purch_number AS mppd_purch_number
+      ,mppd.mppd_unit AS mppd_unit
+      ,mppd.mppd_spec AS mppd_spec
+      ,mppd.mppd_number AS mppd_number
+      ,mppd.mppd_unit_price AS mppd_unit_price
+      ,mppd.mppd_uuid AS mppd_uuid
+      FROM
+      mall_purch_plan mppl
+      LEFT JOIN mall_purch_plan_details mppd ON mppd.mppd_mppl_uuid = mppl.mppl_uuid
+      LEFT JOIN mall_purch_plan_sure mpps ON mpps.mpps_mppd_uuid = mppd.mppd_uuid
+      WHERE
+      mppl.mppl_data_status = 0
+      AND ISNULL(mpps.mpps_sure_status)
+      AND mppl.mppl_uuid = #{mpplUuid}
+      ORDER BY mpps.mpps_sure_time DESC
+    </select>
+
+</mapper>

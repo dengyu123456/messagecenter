@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.purchase.mallpurchplan.dao.MallPurchPlanDetailsMapper">
+  <resultMap id="BaseResultMap" type="com.zhkj.purchase.mallpurchplan.domain.MallPurchPlanDetails">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="mppd_uuid" jdbcType="BIGINT" property="mppdUuid" />
+    <result column="mppd_mppl_uuid" jdbcType="BIGINT" property="mppdMpplUuid" />
+    <result column="mppd_good_uuid" jdbcType="BIGINT" property="mppdGoodUuid" />
+    <result column="mppd_good_name" jdbcType="VARCHAR" property="mppdGoodName" />
+    <result column="mppd_spec" jdbcType="INTEGER" property="mppdSpec" />
+    <result column="mppd_unit_uuid" jdbcType="BIGINT" property="mppdUnitUuid" />
+    <result column="mppd_unit" jdbcType="VARCHAR" property="mppdUnit" />
+    <result column="mppd_base_unit_uuid" jdbcType="BIGINT" property="mppdBaseUnitUuid" />
+    <result column="mppd_base_unit" jdbcType="VARCHAR" property="mppdBaseUnit" />
+    <result column="mppd_purch_number" jdbcType="DECIMAL" property="mppdPurchNumber" />
+    <result column="mppd_number" jdbcType="DECIMAL" property="mppdNumber" />
+    <result column="mppd_unit_price" jdbcType="DECIMAL" property="mppdUnitPrice" />
+    <result column="mppd_remark" jdbcType="VARCHAR" property="mppdRemark" />
+    <result column="mppd_collect_time" jdbcType="TIMESTAMP" property="mppdCollectTime" />
+  </resultMap>
+</mapper>

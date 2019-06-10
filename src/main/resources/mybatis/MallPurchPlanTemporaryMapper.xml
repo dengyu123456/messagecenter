@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.purchase.mallpurchplantemporary.dao.MallPurchPlanTemporaryMapper">
+    <resultMap id="BaseResultMap" type="com.zhkj.purchase.mallpurchplantemporary.domain.MallPurchPlanTemporary">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="mppt_uuid" jdbcType="BIGINT" property="mpptUuid"/>
+        <result column="mppt_memb_uuid" jdbcType="BIGINT" property="mpptMembUuid"/>
+        <result column="mppt_memb_phone" jdbcType="VARCHAR" property="mpptMembPhone"/>
+        <result column="mppt_memb_name" jdbcType="VARCHAR" property="mpptMembName"/>
+        <result column="mppt_buy_uuid" jdbcType="BIGINT" property="mpptBuyUuid"/>
+        <result column="mppt_good_image" jdbcType="VARCHAR" property="mpptGoodImage"/>
+        <result column="mppt_ticket_image" jdbcType="VARCHAR" property="mpptTicketImage"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+        <result column="mppt_leed_time" jdbcType="TIMESTAMP" property="mpptLeedTime"/>
+        <result column="mppt_ente_uuid" jdbcType="BIGINT" property="mpptEnteUuid"/>
+        <result column="mppt_status" jdbcType="BIT" property="mpptStatus"/>
+    </resultMap>
+    <select id="search"
+            parameterType="com.zhkj.purchase.mallpurchplantemporary.domain.request.SearchMallPurchPlanTemporaryParams"
+            resultType="com.zhkj.purchase.mallpurchplantemporary.domain.ResultMallPurchPlanTemporary">
+        SELECT
+        mppt.*
+        ,rent.rent_status AS rent_status,reol.reol_remarks AS reol_remarks,rent.rent_odd_number AS rent_odd_number
+        FROM
+        mall_purch_plan_temporary mppt
+        LEFT JOIN mall_purch_plan_enter mppe ON mppe.mppe_mppl_uuid = mppt.mppt_uuid
+        LEFT JOIN repertory_enter rent ON mppe.mppe_rent_uuid = rent.rent_uuid
+        LEFT JOIN repertory_enter_operate_log reol ON reol.reol_cent_uuid = rent.rent_uuid
+        WHERE
+        mppt.mppt_buy_uuid=#{mpptBuyUuid}
+        AND mppt.mppt_ente_uuid=#{mpptEnteUuid}
+        <if test="mpptLeedStartTime != null">
+            AND mppt.mppt_leed_time >= #{mpptLeedStartTime}
+        </if>
+        <if test="mpptLeedEndTime != null">
+            AND mppt.mppt_leed_time &lt;#{mpptLeedEndTime}
+        </if>
+        <if test="rentStatus != null">
+            AND rent.rent_status =#{rentStatus}
+        </if>
+        ORDER BY mppt.mppt_leed_time
+    </select>
+</mapper>

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.purchase.enterprise.dao.EnterpriseOperationLogMapper">
+    <resultMap id="BaseResultMap" type="com.zhkj.purchase.enterprise.domain.EnterpriseOperationLog">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="eolo_ente_uuid" jdbcType="BIGINT" property="eoloEnteUuid"/>
+        <result column="eolo_operate_status" jdbcType="BIT" property="eoloOperateStatus"/>
+        <result column="eolo_remarks" jdbcType="VARCHAR" property="eoloRemarks"/>
+        <result column="eolo_operator" jdbcType="BIGINT" property="eoloOperator"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+</mapper>

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.purchase.enterprise.dao.EnterpriseMapper">
+    <resultMap id="BaseResultMap" type="com.zhkj.purchase.enterprise.domain.Enterprise">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="ente_uuid" jdbcType="BIGINT" property="enteUuid"/>
+        <result column="ente_parent_uuid" jdbcType="BIGINT" property="enteParentUuid"/>
+        <result column="ente_name" jdbcType="VARCHAR" property="enteName"/>
+        <result column="ente_license" jdbcType="VARCHAR" property="enteLicense"/>
+        <result column="ente_registration_number" jdbcType="VARCHAR" property="enteRegistrationNumber"/>
+        <result column="ente_mechanism_code" jdbcType="VARCHAR" property="enteMechanismCode"/>
+        <result column="ente_social_unified _code" jdbcType="VARCHAR" property="enteSocialUnifiedCode"/>
+        <result column="ente_duty_paragraph" jdbcType="VARCHAR" property="enteDutyParagraph"/>
+        <result column="ente_company_type" jdbcType="VARCHAR" property="enteCompanyType"/>
+        <result column="ente_industry" jdbcType="VARCHAR" property="enteIndustry"/>
+        <result column="ente_start_business_hours" jdbcType="DATE" property="enteStartBusinessHours"/>
+        <result column="ente_end_business_hours" jdbcType="DATE" property="enteEndBusinessHours"/>
+        <result column="ente_approval_time" jdbcType="DATE" property="enteApprovalTime"/>
+        <result column="ente_taxpayer_qualification" jdbcType="VARCHAR" property="enteTaxpayerQualification"/>
+        <result column="ente_personnel_scale" jdbcType="VARCHAR" property="entePersonnelScale"/>
+        <result column="ente_paid_capital" jdbcType="VARCHAR" property="entePaidCapital"/>
+        <result column="ente_registration_authority" jdbcType="VARCHAR" property="enteRegistrationAuthority"/>
+        <result column="ente_insured_number" jdbcType="INTEGER" property="enteInsuredNumber"/>
+        <result column="ente_registration_place" jdbcType="VARCHAR" property="enteRegistrationPlace"/>
+        <result column="ente_type" jdbcType="BIT" property="enteType"/>
+        <result column="ente_data_status" jdbcType="BIT" property="enteDataStatus"/>
+        <result column="ente_status" jdbcType="BIT" property="enteStatus"/>
+        <result column="ente_contract_number" jdbcType="VARCHAR" property="enteContractNumber"/>
+        <result column="ente_contract_start_time" jdbcType="TIMESTAMP" property="enteContractStartTime"/>
+        <result column="ente_contract_end_time" jdbcType="TIMESTAMP" property="enteContractEndTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+</mapper>

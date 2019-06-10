@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.purchase.goodsinquiry.dao.GoodsMapper">
+    <resultMap id="BaseResultMap" type="com.zhkj.purchase.goodsinquiry.domain.Goods">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="good_uuid" jdbcType="BIGINT" property="goodUuid"/>
+        <result column="good_name" jdbcType="VARCHAR" property="goodName"/>
+        <result column="good_name_spell" jdbcType="VARCHAR" property="goodNameSpell"/>
+        <result column="good_subtitle" jdbcType="VARCHAR" property="goodSubtitle"/>
+        <result column="good_hot" jdbcType="BIT" property="goodHot"/>
+        <result column="good_new" jdbcType="BIT" property="goodNew"/>
+        <result column="good_show" jdbcType="BIT" property="goodShow"/>
+        <result column="good_promotion" jdbcType="BIT" property="goodPromotion"/>
+        <result column="good_ente_uuid" jdbcType="BIGINT" property="goodEnteUuid"/>
+        <result column="good_type_uuid" jdbcType="VARCHAR" property="goodTypeUuid"/>
+        <result column="good_sale" jdbcType="DECIMAL" property="goodSale"/>
+        <result column="good_day_sale" jdbcType="DECIMAL" property="goodDaySale"/>
+        <result column="good_review" jdbcType="INTEGER" property="goodReview"/>
+        <result column="good_spec_lock" jdbcType="BIT" property="goodSpecLock"/>
+        <result column="good_image" jdbcType="VARCHAR" property="goodImage"/>
+        <result column="good_gallery" jdbcType="VARCHAR" property="goodGallery"/>
+        <result column="good_data_status" jdbcType="BIT" property="goodDataStatus"/>
+        <result column="good_status" jdbcType="BIT" property="goodStatus"/>
+        <result column="good_stock" jdbcType="DECIMAL" property="goodStock"/>
+        <result column="good_min_stock" jdbcType="DECIMAL" property="goodMinStock"/>
+        <result column="good_max_stock" jdbcType="DECIMAL" property="goodMaxStock"/>
+        <result column="good_loss_rate" jdbcType="DECIMAL" property="goodLossRate"/>
+        <result column="good_purch_type" jdbcType="BIT" property="goodPurchType"/>
+        <result column="good_supp_uuid" jdbcType="BIGINT" property="goodSuppUuid"/>
+        <result column="good_buy_uuid" jdbcType="BIGINT" property="goodBuyUuid"/>
+        <result column="good_assist_code" jdbcType="VARCHAR" property="goodAssistCode"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <resultMap id="SearcGoodsResultMap" type="com.zhkj.purchase.goodsinquiry.domain.SearchGoods">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="good_uuid" jdbcType="BIGINT" property="goodUuid"/>
+        <result column="good_name" jdbcType="VARCHAR" property="goodName"/>
+        <result column="guen_unit" jdbcType="VARCHAR" property="guenUnit"/>
+        <result column="guni_spec" jdbcType="INTEGER" property="guniSpec"/>
+    </resultMap>
+    <select id="selectGood" resultMap="SearcGoodsResultMap"
+            parameterType="com.zhkj.purchase.goodsinquiry.domain.request.SearchGoodsParams">
+        SELECT
+        goods.good_uuid,
+        goods.good_name,
+        guni.guni_spec,
+        guen.guen_unit
+        FROM
+        goods
+        LEFT JOIN goods_unit guni ON goods.good_uuid = guni.guni_good_uuid
+        LEFT JOIN goods_unit_enum guen ON guni.guni_guen_uuid = guen.guen_uuid
+        WHERE
+        goods.good_data_status = 0 AND goods.good_ente_uuid = #{goodEnteUuid}
+        <if test="goodName != null and goodName != ''">
+            AND goods.good_name LIKE CONCAT('%',#{goodName},'%')
+        </if>
+        <if test="goodNameSpell != null and goodNameSpell != ''">
+            AND goods.good_name_spell LIKE CONCAT('%',#{goodNameSpell},'%')
+        </if>
+    </select>
+</mapper>

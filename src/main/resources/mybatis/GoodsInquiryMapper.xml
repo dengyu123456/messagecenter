@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.purchase.goodsinquiry.dao.GoodsInquiryMapper">
+    <resultMap id="BaseResultMap" type="com.zhkj.purchase.goodsinquiry.domain.GoodsInquiry">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="ginq_uuid" jdbcType="BIGINT" property="ginqUuid"/>
+        <result column="ginq_good_uuid" jdbcType="BIGINT" property="ginqGoodUuid"/>
+        <result column="ginq_price" jdbcType="DECIMAL" property="ginqPrice"/>
+        <result column="ginq_suse_uuid" jdbcType="BIGINT" property="ginqSuseUuid"/>
+        <result column="ginq_time" jdbcType="TIMESTAMP" property="ginqTime"/>
+        <result column="ginq_supp_uuid" jdbcType="BIGINT" property="ginqSuppUuid"/>
+        <result column="ginq_img" jdbcType="VARCHAR" property="ginqImg"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="ginq_remarks" jdbcType="VARCHAR" property="ginqRemarks"/>
+        <result column="ginq_ente_uuid" jdbcType="BIGINT" property="ginqEnteUuid"/>
+        <result column="ginq_unit" jdbcType="VARCHAR" property="ginqUnit"/>
+        <result column="ginq_spec" jdbcType="INTEGER" property="ginqSpec"/>
+    </resultMap>
+
+    <resultMap id="SearchResultMap" type="com.zhkj.purchase.goodsinquiry.domain.SearchGoodsInquiry">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="ginq_uuid" jdbcType="BIGINT" property="ginqUuid"/>
+        <result column="ginq_good_uuid" jdbcType="BIGINT" property="ginqGoodUuid"/>
+        <result column="ginq_price" jdbcType="DECIMAL" property="ginqPrice"/>
+        <result column="ginq_suse_uuid" jdbcType="BIGINT" property="ginqSuseUuid"/>
+        <result column="ginq_time" jdbcType="TIMESTAMP" property="ginqTime"/>
+        <result column="ginq_supp_uuid" jdbcType="BIGINT" property="ginqSuppUuid"/>
+        <result column="ginq_img" jdbcType="VARCHAR" property="ginqImg"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="ginq_remarks" jdbcType="VARCHAR" property="ginqRemarks"/>
+        <!--增加字段-->
+        <result column="good_name" jdbcType="VARCHAR" property="ginqGoodName"/>
+        <result column="guni_spec" jdbcType="INTEGER" property="guniSpec"/>
+        <result column="guen_unit" jdbcType="VARCHAR" property="guenUnit"/>
+        <result column="suse_real_name" jdbcType="VARCHAR" property="ginqSuseName"/>
+        <result column="supp_name" jdbcType="VARCHAR" property="ginqSuppName"/>
+    </resultMap>
+
+    <!--搜索个人询价-->
+    <select id="search" resultType="com.zhkj.purchase.goodsinquiry.domain.SearchGoodsInquiry"
+            parameterType="com.zhkj.purchase.goodsinquiry.domain.request.SearchGoodsInquiryParams">
+        SELECT
+        ginq.*,
+        good.good_name,
+        guni.guni_spec,
+        supp.supp_name,
+        suse.suse_real_name,
+        guen.guen_unit
+        FROM
+        goods_inquiry ginq
+        LEFT JOIN goods good ON ginq.ginq_good_uuid = good.good_uuid
+        LEFT JOIN goods_unit guni ON ginq.ginq_good_uuid = guni.guni_good_uuid
+        LEFT JOIN goods_unit_enum guen ON guni.guni_guen_uuid = guen.guen_uuid
+        LEFT JOIN supplier supp ON ginq.ginq_supp_uuid
+        LEFT JOIN system_user suse ON ginq.ginq_suse_uuid = suse.suse_uuid
+        WHERE
+        ginq.ginq_suse_uuid = #{ginqSuseUuid} AND ginq.ginq_ente_uuid = #{ginqEnteUuid}
+        <if test="ginqSTime != null and ginqETime != null">
+            AND ginq.ginq_time &lt;#{ginqETime} AND ginq.ginq_time >= #{ginqSTime}
+        </if>
+    </select>
+
+    <select id="selectInquirySupp"
+            parameterType="com.zhkj.purchase.goodsinquiry.domain.request.SearchGoodsInquiryParams"
+            resultType="com.zhkj.purchase.goodsinquiry.domain.InquirySupp">
+        SELECT
+        DISTINCT
+        supp.supp_name,
+        ginq.ginq_supp_uuid
+        FROM goods_inquiry ginq
+        LEFT JOIN supplier supp ON ginq.ginq_supp_uuid=supp.supp_uuid
+        WHERE
+        ginq.ginq_suse_uuid = #{ginqSuseUuid}
+        AND ginq.ginq_ente_uuid = #{ginqEnteUuid}
+        <if test="suppName != null">
+            AND supp.supp_name LIKE CONCAT('%',#{suppName},'%')
+        </if>
+        <if test="ginqSTime != null and ginqETime != null">
+            AND ginq.ginq_time &lt;#{ginqETime} AND ginq.ginq_time >= #{ginqSTime}
+        </if>
+        ORDER BY ginq.create_time DESC
+    </select>
+
+    <resultMap id="desResultMap"
+               type="com.zhkj.purchase.goodsinquiry.domain.response.SearchGoodsInquiryVO$GoodsInquiryDes">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="ginq_uuid" jdbcType="BIGINT" property="ginqUuid"/>
+        <result column="ginq_good_uuid" jdbcType="BIGINT" property="ginqGoodUuid"/>
+        <result column="ginq_price" jdbcType="DECIMAL" property="ginqPrice"/>
+        <result column="ginq_suse_uuid" jdbcType="BIGINT" property="ginqSuseUuid"/>
+        <result column="ginq_time" jdbcType="TIMESTAMP" property="ginqTime"/>
+        <!--<result column="ginq_supp_uuid" jdbcType="BIGINT" property="ginqSuppUuid"/>-->
+        <result column="ginq_img" jdbcType="VARCHAR" property="ginqImg"/>
+        <!--<result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>-->
+        <result column="ginq_remarks" jdbcType="VARCHAR" property="ginqRemarks"/>
+        <!--增加字段-->
+        <result column="good_name" jdbcType="VARCHAR" property="ginqGoodName"/>
+        <result column="guni_spec" jdbcType="INTEGER" property="guniSpec"/>
+        <result column="guen_unit" jdbcType="VARCHAR" property="guenUnit"/>
+        <result column="suse_real_name" jdbcType="VARCHAR" property="ginqSuseName"/>
+        <!--<result column="supp_name" jdbcType="VARCHAR" property="ginqSuppName"/>-->
+    </resultMap>
+
+    <select id="selectInquiryDes" parameterType="com.zhkj.purchase.goodsinquiry.domain.request.SearchGoodsInquiryParams"
+            resultMap="desResultMap">
+        SELECT
+        ginq.*,
+        good.good_name,
+        guni.guni_spec,
+        -- supp.supp_name,
+        suse.suse_real_name,
+        guen.guen_unit
+        FROM
+        goods_inquiry ginq
+        LEFT JOIN goods good ON ginq.ginq_good_uuid = good.good_uuid
+        LEFT JOIN goods_unit guni ON ginq.ginq_good_uuid = guni.guni_good_uuid
+        LEFT JOIN goods_unit_enum guen ON guni.guni_guen_uuid = guen.guen_uuid
+        -- LEFT JOIN supplier supp ON ginq.ginq_supp_uuid=supp.supp_uuid
+        LEFT JOIN system_user suse ON ginq.ginq_suse_uuid = suse.suse_uuid
+        WHERE
+        ginq.ginq_supp_uuid = #{ginqSuppUuid}
+        AND ginq.ginq_suse_uuid = #{ginqSuseUuid}
+        AND ginq.ginq_ente_uuid = #{ginqEnteUuid}
+        ORDER BY ginq.create_time DESC
+    </select>
+</mapper>

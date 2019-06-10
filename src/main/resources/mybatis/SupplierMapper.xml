@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.purchase.mallpurchplan.dao.SupplierMapper">
+  <resultMap id="BaseResultMap" type="com.zhkj.purchase.goodsinquiry.domain.Supplier">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <result column="id" jdbcType="BIGINT" property="id" />
+    <result column="supp_uuid" jdbcType="BIGINT" property="suppUuid" />
+    <result column="supp_ente_uuid" jdbcType="BIGINT" property="suppEnteUuid" />
+    <result column="supp_name" jdbcType="VARCHAR" property="suppName" />
+    <result column="supp_name_spell" jdbcType="VARCHAR" property="suppNameSpell" />
+    <result column="supp_place" jdbcType="VARCHAR" property="suppPlace" />
+    <result column="supp_address" jdbcType="VARCHAR" property="suppAddress" />
+    <result column="supp_admin" jdbcType="VARCHAR" property="suppAdmin" />
+    <result column="supp_phone" jdbcType="VARCHAR" property="suppPhone" />
+    <result column="supp_email" jdbcType="VARCHAR" property="suppEmail" />
+    <result column="supp_image" jdbcType="VARCHAR" property="suppImage" />
+    <result column="supp_des" jdbcType="VARCHAR" property="suppDes" />
+    <result column="supp_status" jdbcType="BIT" property="suppStatus" />
+    <result column="supp_data_status" jdbcType="BIT" property="suppDataStatus" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="supp_assi_type" jdbcType="BIT" property="suppAssiType" />
+  </resultMap>
+</mapper>
