@@ -5,16 +5,18 @@
  * Information and shall use it only in accordance with the terms of the
  * license agreement you entered into with ZHONGHENG.
  */
-package com.zhkj.nettyserver.util.redis.utils;
+package com.zhkj.nettyserver.util;
 
-import org.apache.commons.lang3.StringUtils;
+
+import org.apache.commons.collections.CollectionUtils;
 
 /**
  * Des:
- * ClassName: StringUtil
+ * ClassName: CollectionUtil
  * Author: biqiang2017@163.com
  * Date: 2018/8/30
- * Time: 2:21
+ * Time: 2:24
  */
-public class StringUtil extends StringUtils{
+public class CollectionUtil extends CollectionUtils{
+
 }

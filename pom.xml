@@ -57,7 +57,7 @@
             <scope>test</scope>
         </dependency>
 
-        <!--utils-->
+        redistils-->
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>

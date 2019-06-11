@@ -1,4 +1,4 @@
-package com.zhkj.nettyserver.util.redis;
+package com.zhkj.nettyserver.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
