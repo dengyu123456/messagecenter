@@ -55,4 +55,4 @@ spring:
       max-wait: -1
 server:
   servlet:
-    context-path: /purchase
+    context-path: /netty

@@ -26,7 +26,7 @@
         </jdbcConnection>
 
         <!-- 数据表对应的model层  -->
-        <javaModelGenerator targetPackage="com.zhkj.purchase.mallpurchplantemporary.domain" targetProject="src/main/java">
+        <javaModelGenerator targetPackage="com.zhkj.nettyserver.mallpurchplantemporary.domain" targetProject="src/main/java">
             <property name="enableSubPackages" value="true"/>
             <property name="trimStrings" value="true"/>
         </javaModelGenerator>
@@ -37,7 +37,7 @@
         </sqlMapGenerator>
 
         <!-- mybatis3中的mapper接口 -->
-        <javaClientGenerator targetPackage="com.zhkj.purchase.mallpurchplantemporary.dao" targetProject="src/main/java"
+        <javaClientGenerator targetPackage="com.zhkj.nettyserver.mallpurchplantemporary.dao" targetProject="src/main/java"
                              type="XMLMAPPER">
             <property name="enableSubPackages" value="true"/>
         </javaClientGenerator>
