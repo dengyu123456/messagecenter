@@ -2,6 +2,8 @@ package com.zhkj.nettyserver.netty;
 
 
 import com.alibaba.fastjson.JSON;
+import com.zhkj.nettyserver.util.redis.RedisUtil;
+import com.zhkj.nettyserver.util.token.TokenUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
@@ -13,6 +15,9 @@ import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.CharsetUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Component;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -29,13 +34,12 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 public class MyHandler extends SimpleChannelInboundHandler<Object> {
 
     private static final Map<String, Channel> userIdChannelMap = new ConcurrentHashMap<>();
-    private static final SessionUtil sessionUtil=new SessionUtil();
-    private ChannelGroup channelGroup ;
+    private static final SubscribeMessage subscribeMessage = new SubscribeMessage();
+    private static final SessionUtil sessionUtil = new SessionUtil();
+    private ChannelGroup channelGroup;
     private WebSocketServerHandshaker handshaker;
     private ChannelHandlerContext ctx;
-    private String sessionId;
-    private String table;
-    private String name;
+    private static final Session session = new Session();
 
     @Override
     protected void messageReceived(ChannelHandlerContext ctx, Object o) throws Exception {
@@ -78,6 +82,8 @@ public class MyHandler extends SimpleChannelInboundHandler<Object> {
     /**
      * 处理Http请求，完成WebSocket握手<br/>
      * 注意：WebSocket连接第一次请求使用的是Http
+     * <p>
+     * 第一次连接中做token校验，将
      *
      * @param ctx
      * @param request
@@ -90,6 +96,17 @@ public class MyHandler extends SimpleChannelInboundHandler<Object> {
             sendHttpResponse(ctx, request, new DefaultFullHttpResponse(HTTP_1_1, BAD_REQUEST));
             return;
         }
+        //得到token信息
+        String token = request.getUri().substring(request.getUri().indexOf("=") + 1, request.getUri().length());
+        String uuid = TokenUtil.getToken(token).getUuid();
+        if (uuid == null) {
+            return;
+        }
+        //管道信息保存
+        session.setSuseUuid(Long.valueOf(uuid));
+        //token解析
+        //放入到session中保存 设置登录信息
+        sessionUtil.bindSession(session, ctx.channel());
 
         // 正常WebSocket的Http连接请求，构造握手响应返回
         WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory("http://" + request.headers().get(HttpHeaders.Names.HOST), null, false);
@@ -117,7 +134,6 @@ public class MyHandler extends SimpleChannelInboundHandler<Object> {
             ByteBuf buf = Unpooled.copiedBuffer(response.getStatus().toString(), CharsetUtil.UTF_8);
             response.content().writeBytes(buf);
             buf.release();
-
             //允许跨域访问 设置头部信息
             response.headers().set(ACCESS_CONTROL_ALLOW_ORIGIN, "192.168.0.102");
             response.headers().set(ACCESS_CONTROL_ALLOW_METHODS, "GET,POST,PUT,DELETE");
@@ -198,6 +214,8 @@ public class MyHandler extends SimpleChannelInboundHandler<Object> {
 //        }
         // 判断是否是关闭链路的指令
         if (frame instanceof CloseWebSocketFrame) {
+            //删除管道
+            sessionUtil.unBindSession(ctx.channel());
             handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
             return;
         }
@@ -206,28 +224,41 @@ public class MyHandler extends SimpleChannelInboundHandler<Object> {
             ctx.channel().write(new PongWebSocketFrame(frame.content().retain()));
             return;
         }
+        if (this.handshaker == null || this.ctx == null || this.ctx.isRemoved()) {
+            throw new Exception("尚未握手成功，无法向客户端发送WebSocket消息");
+        }
         if ((frame instanceof TextWebSocketFrame)) {
             String text = ((TextWebSocketFrame) frame).text();
-            System.out.println(text);
-            this.sendWebSocket(text);
 
-            Message message= JSON.parseObject(text,Message.class);
+            //this.sendWebSocket(text);
 
-            //如果是已注册，则放到session里面保存
-            if (ctx.channel().isRegistered()){
+            Message message = JSON.parseObject(text, Message.class);
 
-                Session session=new Session();
-                session.setSuseUuid(message.getSuseUuid());
-                sessionUtil.bindSession(session,ctx.channel());
+
+            //判断是否是群发消息
+            if (message.getMessAction() == 0) {
+                //如果是系统群发消息，则从session中拿出所有的管道
+                ChannelGroup channelGroup1 = sessionUtil.getChannelGroup(ctx);
+                // 开启检测redis线程
+                // subscribeMessage.readRedis(channelGroup1);
+                System.out.println(channelGroup1.size());
+                channelGroup1.writeAndFlush(new TextWebSocketFrame((JSON.toJSONString(message))));
             }
+            //如果是发送群组消息
+            if (message.getMessAction() == 1) {
+                //建立一个管道分组
+                channelGroup = new DefaultChannelGroup(ctx.executor());
+                //拿到群组中的人的Uuid
 
-            //建立一个管道组
-            channelGroup = new DefaultChannelGroup(ctx.executor());
+                //拿到对应的管道
 
-            //从session里面拉出在线的人然后放到管道组
-
-            //向每个在群聊中在线的人发送消息
-            channelGroup.writeAndFlush(text);
+            }
+            //点对点消息
+            if (message.getMessAction() == 2) {
+                System.out.println(text);
+                Channel channel2 = sessionUtil.getChannel(message.getMessSuseUuid());
+                channel2.writeAndFlush(new TextWebSocketFrame((JSON.toJSONString(message))));
+            }
 
         }
 
@@ -239,12 +270,11 @@ public class MyHandler extends SimpleChannelInboundHandler<Object> {
      * WebSocket返回
      */
     public void sendWebSocket(String msg) throws Exception {
-        if (this.handshaker == null || this.ctx == null || this.ctx.isRemoved()) {
-            throw new Exception("尚未握手成功，无法向客户端发送WebSocket消息");
-        }
+
         //发送消息
         this.ctx.channel().write(new TextWebSocketFrame(msg));
         this.ctx.flush();
     }
+
 
 }

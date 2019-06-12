@@ -1,8 +1,13 @@
 package com.zhkj.nettyserver.netty;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
 
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -15,7 +20,7 @@ public class SessionUtil {
 
     // userId -> channel 的映射
     private static final Map<Long, Channel> userIdChannelMap = new ConcurrentHashMap<>();
-
+    private static final Session session = new Session();
 
     //建立会话，保存连接映射
     public static void bindSession(Session session, Channel channel) {
@@ -23,6 +28,7 @@ public class SessionUtil {
         channel.attr(Attributes.SESSION).set(session);
     }
 
+    //删除映射
     public static void unBindSession(Channel channel) {
         if (hasLogin(channel)) {
             userIdChannelMap.remove(getSession(channel).getSuseUuid());
@@ -32,7 +38,7 @@ public class SessionUtil {
 
     public static boolean hasLogin(Channel channel) {
 
-        return channel.attr(Attributes.SESSION).get()==null;
+        return channel.attr(Attributes.SESSION).get() == null;
     }
 
     public static Session getSession(Channel channel) {
@@ -40,8 +46,20 @@ public class SessionUtil {
         return channel.attr(Attributes.SESSION).get();
     }
 
-    public static Channel getChannel(String userId) {
-
+    //通过用户uuid拿到管道
+    public static Channel getChannel(Long userId) {
+//        session.setSuseUuid(userId);
         return userIdChannelMap.get(userId);
+    }
+
+    //得到所有通道
+    public static ChannelGroup getChannelGroup(ChannelHandlerContext ctx) {
+        ChannelGroup channelGroup = new DefaultChannelGroup(ctx.executor());
+        Set<Long> keySet = userIdChannelMap.keySet();
+        for (Iterator<Long> iterator = keySet.iterator(); iterator.hasNext(); ) {
+            Long key = iterator.next();
+            channelGroup.add(userIdChannelMap.get(key));
+        }
+        return channelGroup;
     }
 }

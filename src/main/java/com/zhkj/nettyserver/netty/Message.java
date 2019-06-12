@@ -8,10 +8,9 @@ package com.zhkj.nettyserver.netty;
  */
 public class Message {
 
-    private String MOOjaidsjioas;
 
     //判断是否群发
-    private String messAction;
+    private Integer messAction;
 
     //消息
     private String messMain;
@@ -19,22 +18,25 @@ public class Message {
     //发消息
     private Long suseUuid;
 
-    //收消息
-    private String messSuseUuid;
+    //收消息的人
+    private Long messSuseUuid;
 
-    public String getMOOjaidsjioas() {
-        return MOOjaidsjioas;
+    //第一次验证
+    private String messToken;
+
+    public String getMessToken() {
+        return messToken;
     }
 
-    public void setMOOjaidsjioas(String MOOjaidsjioas) {
-        this.MOOjaidsjioas = MOOjaidsjioas;
+    public void setMessToken(String messToken) {
+        this.messToken = messToken;
     }
 
-    public String getMessAction() {
+    public Integer getMessAction() {
         return messAction;
     }
 
-    public void setMessAction(String messAction) {
+    public void setMessAction(Integer messAction) {
         this.messAction = messAction;
     }
 
@@ -54,11 +56,11 @@ public class Message {
         this.suseUuid = suseUuid;
     }
 
-    public String getMessSuseUuid() {
+    public Long getMessSuseUuid() {
         return messSuseUuid;
     }
 
-    public void setMessSuseUuid(String messSuseUuid) {
+    public void setMessSuseUuid(Long messSuseUuid) {
         this.messSuseUuid = messSuseUuid;
     }
 }
