@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.nettyserver.message.dao.ChatMapper">
+    <resultMap id="BaseResultMap" type="com.zhkj.nettyserver.message.domain.Chat">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <result column="id" jdbcType="BIGINT" property="id"/>
+        <result column="chat_uuid" jdbcType="BIGINT" property="chatUuid"/>
+        <result column="chat_name" jdbcType="VARCHAR" property="chatName"/>
+        <result column="chat_csuse_uuid" jdbcType="BIGINT" property="chatCsuseUuid"/>
+        <result column="chat_esuse_uuid" jdbcType="BIGINT" property="chatEsuseUuid"/>
+        <result column="chat_public" jdbcType="BIT" property="chatPublic"/>
+        <result column="chat_type" jdbcType="BIT" property="chatType"/>
+        <result column="chat_count" jdbcType="BIT" property="chatCount"/>
+        <result column="chat_last_time" jdbcType="TIMESTAMP" property="chatLastTime"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+    <!--
+          增加了selectChatOneToOne方法增加AND chat_type=1
+        -->
+    <select id="selectChatOneToOne" resultMap="BaseResultMap">
+    SELECT c.* FROM chat c LEFT JOIN chat_user cu ON c.chat_uuid=cu.cuse_chat_uuid WHERE c.chat_csuse_uuid=#{sSuseUuid} AND
+    c.chat_count=2 AND cu.cuse_suse_uuid=#{eSuseUuid} AND chat_type=1
+  </select>
+
+
+    <select id="selectChatBySuseUuid" resultMap="BaseResultMap">
+        SELECT c.* FROM chat c WHERE c.chat_uuid IN
+        (SELECT cuse.cuse_chat_uuid FROM chat_user cuse
+        <where>
+            <if test="suseUuid != null">
+                cuse.cuse_suse_uuid=#{suseUuid}
+            </if>
+            <if test="isAll == false">
+                AND cuse.cuse_chat_status=0
+                AND cuse.cuse_data_stutus=0
+            </if>
+        </where>
+        )
+        <if test="chatType != null">
+            AND c.chat_type=#{chatType}
+        </if>
+    </select>
+
+    <update id="updateSubCountByChatUuid">
+      UPDATE chat SET chat_count =chat_count - 1 WHERE chat_uuid = #{cgroChatUuid} AND chat_count &gt; 0
+    </update>
+    <update id="updateChatCountByChatUuid">
+      UPDATE chat_group SET cgro_count = cgro_count-1 WHERE cgro_uuid = #{chatUuid}
+    </update>
+</mapper>

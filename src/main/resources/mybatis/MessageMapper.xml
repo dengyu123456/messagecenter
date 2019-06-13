@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.nettyserver.message.dao.MessageMapper">
+  <resultMap id="BaseResultMap" type="com.zhkj.nettyserver.message.domain.Message">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="mess_uuid" jdbcType="BIGINT" property="messUuid" />
+    <result column="mess_chat_uuid" jdbcType="BIGINT" property="messChatUuid" />
+    <result column="mess_suse_uuid" jdbcType="BIGINT" property="messSuseUuid" />
+    <result column="mess_date" jdbcType="BIGINT" property="messDate" />
+    <result column="mess_content_type" jdbcType="BIT" property="messContentType" />
+    <result column="mess_content" jdbcType="LONGVARCHAR" property="messContent" />
+  </resultMap>
+  <select id="selectLastMessage" resultMap="BaseResultMap">
+    SELECT msg.* FROM message msg WHERE msg.mess_chat_uuid=#{chatUuid} ORDER BY msg.mess_date DESC LIMIT 1
+  </select>
+</mapper>

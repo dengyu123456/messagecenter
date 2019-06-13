@@ -17,7 +17,6 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 public class NettyService {
 
     public NettyService() {
-//      new Thread(() -> {
             System.out.println("启动Netty!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             EventLoopGroup bossGroup = new NioEventLoopGroup();
             EventLoopGroup workerGroup = new NioEventLoopGroup();
@@ -34,7 +33,6 @@ public class NettyService {
                 bossGroup.shutdownGracefully();
                 workerGroup.shutdownGracefully();
             }
-//        }).start();
     }
 
 

@@ -8,21 +8,26 @@ package com.zhkj.nettyserver.netty;
  */
 public class Message {
 
-
-    //判断是否群发
+    //判断是否群发 0：系统消息 1群聊 2点对点 （3创建会话，4拉取最近通话，5，）
     private Integer messAction;
 
-    //消息
-    private String messMain;
+    //收到的消息
+    private Object messMain;
 
-    //发消息
+    //发消息的用户
     private Long suseUuid;
 
-    //收消息的人
+    //收消息的用户
     private Long messSuseUuid;
 
-    //第一次验证
+    //第一次验证登录token
     private String messToken;
+
+    //群组Uuid
+    private Long messCgroUuid;
+
+    //返回消息体
+    private Object messObject;
 
     public String getMessToken() {
         return messToken;
@@ -40,9 +45,6 @@ public class Message {
         this.messAction = messAction;
     }
 
-    public String getMessMain() {
-        return messMain;
-    }
 
     public void setMessMain(String messMain) {
         this.messMain = messMain;
@@ -62,5 +64,29 @@ public class Message {
 
     public void setMessSuseUuid(Long messSuseUuid) {
         this.messSuseUuid = messSuseUuid;
+    }
+
+    public Long getMessCgroUuid() {
+        return messCgroUuid;
+    }
+
+    public void setMessCgroUuid(Long messCgroUuid) {
+        this.messCgroUuid = messCgroUuid;
+    }
+
+    public Object getMessObject() {
+        return messObject;
+    }
+
+    public void setMessObject(Object messObject) {
+        this.messObject = messObject;
+    }
+
+    public Object getMessMain() {
+        return messMain;
+    }
+
+    public void setMessMain(Object messMain) {
+        this.messMain = messMain;
     }
 }

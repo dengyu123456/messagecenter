@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.nettyserver.message.dao.ChatGroupMapper">
+    <resultMap id="BaseResultMap" type="com.zhkj.nettyserver.message.domain.ChatGroup">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="cgro_uuid" jdbcType="BIGINT" property="cgroUuid"/>
+        <result column="cgro_chat_uuid" jdbcType="BIGINT" property="cgroChatUuid"/>
+        <result column="cgro_name" jdbcType="VARCHAR" property="cgroName"/>
+        <result column="cgro_csuse_uuid" jdbcType="BIGINT" property="cgroCsuseUuid"/>
+        <result column="cgro_public" jdbcType="BIT" property="cgroPublic"/>
+        <result column="cgro_type" jdbcType="BIT" property="cgroType"/>
+        <result column="cgro_count" jdbcType="BIT" property="cgroCount"/>
+        <result column="cgro_data_status" jdbcType="BIT" property="cgroDataStatus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+
+    <select id="selectChatGroupBySuseUuid" resultMap="BaseResultMap">
+    SELECT cgro.* FROM chat_group cgro WHERE cgro.cgro_uuid IN (SELECT cgus.cgus_cgro_uuid FROM chat_group_user cgus
+    WHERE cgus.cgus_suse_uuid=#{suseUuid} AND cgus.cgus_data_stutus=0) AND  cgro.cgro_data_status=0
+    </select>
+    <update id="updateSubCountByCgroUuid">
+    UPDATE chat_group SET cgro_count = cgro_count-1 WHERE cgro_uuid = #{cgroCount} AND cgro_count > 0
+    </update>
+    <update id="updateAddCountByCgroUuid">
+    UPDATE chat_group SET cgro_count = cgro_count+1 WHERE cgro_uuid = #{cgusCgroUuid}
+    </update>
+    <update id="updateChatGroupCountByChatGroupUuid">
+    UPDATE chat_group SET cgro_count = cgro_count-#{length} WHERE cgro_uuid = #{cgroUuid} and cgro_count > 0
+    </update>
+    <select id="selectOneByCgroUuid" resultMap="BaseResultMap">
+    SELECT * FROM chat_group WHERE cgro_uuid = #{cgroUuid}
+    </select>
+</mapper>

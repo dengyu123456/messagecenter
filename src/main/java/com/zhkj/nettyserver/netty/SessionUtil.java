@@ -4,6 +4,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
+import org.springframework.stereotype.Component;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -16,9 +17,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * Author: dengyi
  * Date: 2019-06-11 15:24
  */
+@Component
 public class SessionUtil {
 
-    // userId -> channel 的映射
+    // suseUuid -> channel 的映射
     private static final Map<Long, Channel> userIdChannelMap = new ConcurrentHashMap<>();
     private static final Session session = new Session();
 
@@ -37,7 +39,6 @@ public class SessionUtil {
     }
 
     public static boolean hasLogin(Channel channel) {
-
         return channel.attr(Attributes.SESSION).get() == null;
     }
 

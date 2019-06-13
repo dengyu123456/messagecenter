@@ -7,7 +7,7 @@
  */
 package com.zhkj.nettyserver.common.base.service.impl;
 
-import com.zhkj.msgcenter.common.base.service.BaseService;
+import com.zhkj.nettyserver.common.base.service.BaseService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

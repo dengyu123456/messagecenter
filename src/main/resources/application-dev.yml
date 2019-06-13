@@ -12,7 +12,7 @@ spring:
     driverClassName: com.mysql.cj.jdbc.Driver
     #    url: jdbc:mysql://192.168.0.103/qytest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
     #    url: jdbc:mysql://127.0.0.1/qytest?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
-    url: jdbc:mysql://127.0.0.1/test?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
+    url: jdbc:mysql://127.0.0.1/adminchat?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
 #    url: jdbc:mysql://192.168.0.114/qy20190404?useUnicode=true&characterEncoding=utf-8&serverTimezone=GMT%2B8
 #    username: test
 #    password: Xzd147258,

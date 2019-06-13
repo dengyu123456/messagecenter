@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.nettyserver.message.dao.ChatUserMapper">
+  <resultMap id="BaseResultMap" type="com.zhkj.nettyserver.message.domain.ChatUser">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="cuse_uuid" jdbcType="BIGINT" property="cuseUuid" />
+    <result column="cuse_suse_uuid" jdbcType="BIGINT" property="cuseSuseUuid" />
+    <result column="cuse_chat_uuid" jdbcType="BIGINT" property="cuseChatUuid" />
+    <result column="cuse_order" jdbcType="INTEGER" property="cuseOrder" />
+    <result column="cuse_name" jdbcType="VARCHAR" property="cuseName" />
+    <result column="cuse_data_stutus" jdbcType="BIT" property="cuseDataStutus" />
+    <result column="cuse_chat_status" jdbcType="BIT" property="cuseChatStatus" />
+    <result column="cuse_line" jdbcType="BIT" property="cuseLine" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+  </resultMap>
+</mapper>

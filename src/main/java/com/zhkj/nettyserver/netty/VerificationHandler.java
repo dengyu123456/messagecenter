@@ -7,7 +7,7 @@ import io.netty.util.Attribute;
 /**
  * @author dengyi
  * time:2019年6月11日 10:31:17
- * 登录验证类
+ * 登录验证类 暂时不用处理器验证
  */
 public class VerificationHandler extends SimpleChannelInboundHandler<Object> {
 

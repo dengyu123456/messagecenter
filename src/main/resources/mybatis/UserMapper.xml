@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.nettyserver.message.dao.UserMapper">
+    <resultMap id="BaseResultMap" type="com.zhkj.nettyserver.message.domain.User">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="user_uuid" jdbcType="BIGINT" property="userUuid"/>
+        <result column="user_name" jdbcType="VARCHAR" property="userName"/>
+        <result column="user_type" jdbcType="BIT" property="userType"/>
+        <result column="user_head" jdbcType="VARCHAR" property="userHead"/>
+        <result column="user_ente_uuid" jdbcType="BIGINT" property="userEnteUuid"/>
+        <result column="user_status" jdbcType="BIT" property="userStatus"/>
+        <result column="user_data_status" jdbcType="BIT" property="userDataStatus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+        <result column="update_time" jdbcType="TIMESTAMP" property="updateTime"/>
+    </resultMap>
+    <select id="selectOneByUserUuid" resultMap="BaseResultMap">
+    SELECT * FROM user WHERE user_data_status = 0 AND user_uuid = #{userUuid}
+  </select>
+    <select id="selectUserByUserUuid" resultMap="BaseResultMap">
+    SELECT * FROM user WHERE user_uuid = #{userUuid}
+  </select>
+</mapper>
