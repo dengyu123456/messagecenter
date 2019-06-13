@@ -53,7 +53,8 @@ public class ChatController {
             tmp.setChatCsuseUuid(params.getsSuseUuid());
             tmp.setChatType(0);
             Chat chat = this.messageService.selectChatOne(tmp);
-            if (chat == null) {//如果会话不存在创建
+            //如果会话不存在创建
+            if (chat == null) {
                 chat = this.messageService.insertChat(params);
             }
             OpenVO vo = new OpenVO();
@@ -302,9 +303,9 @@ public class ChatController {
     @ApiOperation(value = "", notes = "修改群")
 //    @RequestMapping(value = "/edit/group", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 //    @ResponseBody
-    public String editGroup(EditChatGroupParams params,String token) {
-        TokenVO tokenVO = TokenUtil.getToken(token);
-        int updateCount = this.messageService.updateChatGroup(params,tokenVO.getUuid());
+    public String editGroup(EditChatGroupParams params,Long suseUuid) {
+
+        int updateCount = this.messageService.updateChatGroup(params,suseUuid.toString());
         if (updateCount == 1) {
             return "修改群成功";
         } else {

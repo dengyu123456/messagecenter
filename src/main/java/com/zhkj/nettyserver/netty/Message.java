@@ -8,11 +8,11 @@ package com.zhkj.nettyserver.netty;
  */
 public class Message {
 
-    //判断是否群发 0：系统消息 1群聊 2点对点 （3创建会话，4拉取最近通话，5，）
+    //判断是否群发 0：系统消息 1群聊 2点对点 （3创建会话，4拉取最近通话，5，拉取群组 6，）
     private Integer messAction;
 
     //收到的消息
-    private Object messMain;
+    private String messMain;
 
     //发消息的用户
     private Long suseUuid;
@@ -20,22 +20,12 @@ public class Message {
     //收消息的用户
     private Long messSuseUuid;
 
-    //第一次验证登录token
-    private String messToken;
-
     //群组Uuid
     private Long messCgroUuid;
 
     //返回消息体
     private Object messObject;
 
-    public String getMessToken() {
-        return messToken;
-    }
-
-    public void setMessToken(String messToken) {
-        this.messToken = messToken;
-    }
 
     public Integer getMessAction() {
         return messAction;
@@ -82,11 +72,8 @@ public class Message {
         this.messObject = messObject;
     }
 
-    public Object getMessMain() {
+    public String getMessMain() {
         return messMain;
     }
 
-    public void setMessMain(Object messMain) {
-        this.messMain = messMain;
-    }
 }

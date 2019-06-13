@@ -54,7 +54,7 @@ public class OpenParams {
     /**
      * 接受会话方Uuid
      */
-    @ApiModelProperty(value = "",notes = "接受会话方Uuid/t",example = "")
+    @ApiModelProperty(value = "",notes = "接受会话方Uuid",example = "")
     private Long eSuseUuid;
 
     public String getChatName() {
