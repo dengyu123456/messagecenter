@@ -14,13 +14,15 @@ package com.zhkj.nettyserver.message.controller;///**
  import com.zhkj.nettyserver.util.token.TokenVO;
  import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.springframework.beans.factory.annotation.Autowired;
+ import org.apache.ibatis.annotations.Lang;
+ import org.springframework.beans.factory.annotation.Autowired;
  import org.springframework.stereotype.Component;
  import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
+ import sun.applet.Main;
 
-import javax.validation.Valid;
+ import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -130,6 +132,7 @@ public class ChatController {
         return voList;
     }
 
+
     /**
      * 获取好友
      *
@@ -143,7 +146,7 @@ public class ChatController {
         if (user == null) {
             return null;
         }
-        List<User> userList = this.messageService.selectUserByEnteUuid(user.getUserEnteUuid(), false);
+        List<User> userList = this.messageService.selectUserByEnteUuid(user.getUserEnteUuid(), false,suseUuid);
         List<UserVO> voList = new ArrayList<UserVO>();
         if (!CollectionUtils.isEmpty(userList)) {
             for (User item : userList) {

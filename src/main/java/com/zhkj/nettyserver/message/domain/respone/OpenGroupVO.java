@@ -7,6 +7,8 @@
  */
 package com.zhkj.nettyserver.message.domain.respone;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.zhkj.nettyserver.message.domain.ChatGroupUser;
 import io.swagger.annotations.ApiModel;
@@ -28,6 +30,7 @@ public class OpenGroupVO {
      * 群Uuid
      */
     @ApiModelProperty(value = "",notes = "群Uuid",example ="" )
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgroUuid;
 
     /**
@@ -40,6 +43,7 @@ public class OpenGroupVO {
      * 群创建者Uuid
      */
     @ApiModelProperty(value = "",notes = "群创建者Uuid",example ="" )
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgroCsuseUuid;
 
     /**

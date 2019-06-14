@@ -257,14 +257,15 @@ public class MessageServiceImpl implements MessageService {
      * @return
      */
     @Override
-    public List<User> selectUserByEnteUuid(Long userEnteUuid, boolean isAll) {
+    public List<User> selectUserByEnteUuid(Long userEnteUuid, boolean isAll,Long suseUuid) {
         User params = new User();
         params.setUserEnteUuid(userEnteUuid);
         params.setUserType(0);
         if (!isAll) {
             params.setUserDataStatus(0);
         }
-        return this.userMapper.select(params);
+        return this.userMapper.selectByExample(Example.builder(User.class).andWhere(Sqls.custom().andEqualTo("userEnteUuid",userEnteUuid).andEqualTo("userType",0).andEqualTo("userDataStatus",params.getUserDataStatus()).andNotEqualTo("userUuid",suseUuid)).build());
+//        return this.userMapper.select(params);
     }
 
     /**
@@ -302,9 +303,9 @@ public class MessageServiceImpl implements MessageService {
         chat.setChatLastTime(currTime);
         count += this.chatMapper.updateByExampleSelective(chat, Example.builder(Chat.class).andWhere(Sqls.custom()
                 .andEqualTo("chatUuid", params.getMessChatUuid())).build());
-        if (count < 2) {
-            throw new RuntimeException("更新错误");
-        }
+//        if (count < 2) {
+//            throw new RuntimeException("更新错误");
+//        }
         return count;
     }
 

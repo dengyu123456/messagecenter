@@ -22,6 +22,7 @@ public class SessionUtil {
 
     // suseUuid -> channel 的映射
     private static final Map<Long, Channel> userIdChannelMap = new ConcurrentHashMap<>();
+
     private static final Session session = new Session();
 
     //建立会话，保存连接映射

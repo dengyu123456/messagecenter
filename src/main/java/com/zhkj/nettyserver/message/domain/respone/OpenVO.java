@@ -7,11 +7,14 @@
  */
 package com.zhkj.nettyserver.message.domain.respone;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Des:
@@ -26,6 +29,7 @@ public class OpenVO {
      * 会话Uuid
      */
     @ApiModelProperty(value = "",notes = "会话Uuid",example = "")
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long chatUuid;
 
     /**
@@ -38,6 +42,7 @@ public class OpenVO {
      * 会话创建者Uuid
      */
     @ApiModelProperty(value = "",notes = "会话创建者Uuid",example = "")
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long chatCsuseUuid;
 
     /**
@@ -70,6 +75,17 @@ public class OpenVO {
     @ApiModelProperty(value = "",notes = "创建时间yyyy-MM-dd HH:mm:ss",example = "")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date createTime;
+
+    //历史聊天记录
+    private List<SearchMessageVO> messageVOList;
+
+    public List<SearchMessageVO> getMessageVOList() {
+        return messageVOList;
+    }
+
+    public void setMessageVOList(List<SearchMessageVO> messageVOList) {
+        this.messageVOList = messageVOList;
+    }
 
     public Long getChatUuid() {
         return chatUuid;

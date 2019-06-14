@@ -7,6 +7,8 @@
  */
 package com.zhkj.nettyserver.message.domain.respone;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -25,12 +27,14 @@ public class SearchMessageVO {
      * 会话Uuid
      */
     @ApiModelProperty(value = "",notes = "会话Uuid",example = "")
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long messChatUuid;
 
     /**
      * 消息发出者Uuid
      */
     @ApiModelProperty(value = "",notes = "消息发出者Uuid",example = "")
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long messSuseUuid;
 
     /**
@@ -43,7 +47,8 @@ public class SearchMessageVO {
      * 消息时间戳yyyy-MM-dd HH:mm:ss
      */
     @ApiModelProperty(value = "",notes = "消息时间戳yyyy-MM-dd HH:mm:ss",example = "")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long messDate;
 
     /**

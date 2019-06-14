@@ -57,6 +57,36 @@ public class OpenParams {
     @ApiModelProperty(value = "",notes = "接受会话方Uuid",example = "")
     private Long eSuseUuid;
 
+    /**
+     * 消息开始时间
+     */
+    @ApiModelProperty(value = "",notes = "消息开始时间/t",example = "")
+    @NotNull(message = "请指定消息开始时间")
+    private Long messStartDate;
+
+    /**
+     * 消息结束时间
+     */
+    @ApiModelProperty(value = "",notes = "消息结束时间/t",example = "")
+    @NotNull(message = "请指定消息结束时间")
+    private Long messEndDate;
+
+    public Long getMessStartDate() {
+        return messStartDate;
+    }
+
+    public void setMessStartDate(Long messStartDate) {
+        this.messStartDate = messStartDate;
+    }
+
+    public Long getMessEndDate() {
+        return messEndDate;
+    }
+
+    public void setMessEndDate(Long messEndDate) {
+        this.messEndDate = messEndDate;
+    }
+
     public String getChatName() {
         return chatName;
     }

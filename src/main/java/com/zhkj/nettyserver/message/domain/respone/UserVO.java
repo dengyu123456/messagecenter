@@ -1,5 +1,7 @@
 package com.zhkj.nettyserver.message.domain.respone;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -12,6 +14,7 @@ public class UserVO {
      * 用户uuid
      */
     @ApiModelProperty(value = "",notes = "用户uuid",example = "")
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long userUuid;
 
     /**

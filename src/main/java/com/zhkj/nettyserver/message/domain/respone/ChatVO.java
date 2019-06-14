@@ -7,6 +7,8 @@
  */
 package com.zhkj.nettyserver.message.domain.respone;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -26,6 +28,7 @@ public class ChatVO {
      * 会话Uuid
      */
     @ApiModelProperty(value = "",notes = "会话Uuid",example = "")
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long chatUuid;
 
     /**
@@ -38,6 +41,7 @@ public class ChatVO {
      * 会话创建者Uuid
      */
     @ApiModelProperty(value = "",notes = "会话创建者Uuid",example = "")
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long chatCsuseUuid;
 
     /**
@@ -72,6 +76,16 @@ public class ChatVO {
     private MessageVO chatLastMessage;
 
     /**
+     * 会话对方姓名
+     */
+    private String rSuseName;
+
+    /**
+     * 会话群组
+     */
+    private Long cgroUuid;
+
+    /**
      * 创建时间
      */
     @ApiModelProperty(value = "",notes = "",example = "")
@@ -85,6 +99,7 @@ public class ChatVO {
          * 消息发出者Uuid
          */
         @ApiModelProperty(value = "",notes = "消息发出者Uuid",example = "")
+        @JSONField(serializeUsing = ToStringSerializer.class)
         private Long messSuseUuid;
 
         /**
@@ -208,5 +223,21 @@ public class ChatVO {
 
     public void setChatLastMessage(MessageVO chatLastMessage) {
         this.chatLastMessage = chatLastMessage;
+    }
+
+    public String getrSuseName() {
+        return rSuseName;
+    }
+
+    public void setrSuseName(String rSuseName) {
+        this.rSuseName = rSuseName;
+    }
+
+    public Long getCgroUuid() {
+        return cgroUuid;
+    }
+
+    public void setCgroUuid(Long cgroUuid) {
+        this.cgroUuid = cgroUuid;
     }
 }

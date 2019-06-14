@@ -102,7 +102,7 @@ public interface MessageService {
      * @param userEnteUuid
      * @return
      */
-    List<User> selectUserByEnteUuid(Long userEnteUuid, boolean isAll);
+    List<User> selectUserByEnteUuid(Long userEnteUuid, boolean isAll,Long suseUuid);
 
     /**
      * 获取群

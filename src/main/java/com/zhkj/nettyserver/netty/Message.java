@@ -1,5 +1,8 @@
 package com.zhkj.nettyserver.netty;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
+
 /**
  * Des:消息对象
  * ClassName: Message
@@ -15,12 +18,15 @@ public class Message {
     private String messMain;
 
     //发消息的用户
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long suseUuid;
 
     //收消息的用户
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long messSuseUuid;
 
     //群组Uuid
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long messCgroUuid;
 
     //返回消息体

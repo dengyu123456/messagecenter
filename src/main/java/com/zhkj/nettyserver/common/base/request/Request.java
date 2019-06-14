@@ -7,6 +7,9 @@
  */
 package com.zhkj.nettyserver.common.base.request;
 
+import com.alibaba.fastjson.JSON;
+import com.zhkj.nettyserver.netty.Message;
+
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
@@ -81,4 +84,5 @@ public class Request<T> {
     public void setPage(Integer page) {
         this.page = page;
     }
+
 }

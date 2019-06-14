@@ -1,7 +1,6 @@
 package com.zhkj.nettyserver.netty;
 
 
-import com.alibaba.druid.support.json.JSONUtils;
 import com.alibaba.fastjson.JSON;
 import com.zhkj.nettyserver.message.controller.ChatController;
 import com.zhkj.nettyserver.message.domain.ChatUser;
@@ -14,14 +13,12 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.codec.http.DefaultFullHttpResponse;
 import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.FullHttpResponse;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.CharsetUtil;
-import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
@@ -39,7 +36,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
  */
 public class MyHandler extends SimpleChannelInboundHandler<Object> {
 
-    private static final Map<String, Channel> userIdChannelMap = new ConcurrentHashMap<>();
+    // private  final Map<String, Channel> userIdChannelMap = new ConcurrentHashMap<>();
 
     //private static final SubscribeMessage subscribeMessage = SpringUtil.getBean(SubscribeMessage.class);
 
@@ -99,25 +96,27 @@ public class MyHandler extends SimpleChannelInboundHandler<Object> {
         if (handshaker == null) { // 无法处理的websocket版本
             WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
         } else { // 向客户端发送websocket握手,完成握手
+
+            handshaker.handshake(ctx.channel(), request);
+            // 记录管道处理上下文
+            this.ctx = ctx;
             //如果当前管道没有映射
+            //得到token信息
+            //token解析
             if (sessionUtil.getSession(ctx.channel()) == null) {
-                //得到token信息
-                //token解析
                 String token = request.getUri().substring(request.getUri().indexOf("=") + 1, request.getUri().length());
                 String uuid = TokenUtil.getToken(token).getUuid();
                 if (uuid == null) {
                     throw new Exception("用户登录异常");
                 }
                 session.setSuseUuid(Long.valueOf(uuid));
-                System.out.println(session.getSuseUuid());
                 //放入到session中保存 设置登录信息
                 sessionUtil.bindSession(session, ctx.channel());
+                System.out.println(uuid);
+                System.out.println(sessionUtil.getSession(ctx.channel()).getSuseUuid());
                 //将管道组加入
                 // subscribeMessage.setChannelGroup(sessionUtil.getChannelGroup(ctx));
             }
-            handshaker.handshake(ctx.channel(), request);
-            // 记录管道处理上下文，便于服务器推送数据到客户端
-            this.ctx = ctx;
         }
     }
 
@@ -255,13 +254,31 @@ public class MyHandler extends SimpleChannelInboundHandler<Object> {
             if (message.getMessAction() == 1) {
                 String messMain = message.getMessMain();
                 OpenParams params = JSON.parseObject(messMain, OpenParams.class);
+
                 OpenVO openVO = chatController.openChat(params);
-                message.setMessAction(1);
-                message.setMessObject(openVO);
+                //把历史聊天记录加入到 会话中
+                SearchMessageParams messageParams = new SearchMessageParams();
+                messageParams.setMessChatUuid(openVO.getChatUuid());
+                messageParams.setMessEndDate(params.getMessEndDate());
+                messageParams.setMessStartDate(params.getMessStartDate());
+                List<SearchMessageVO> voList = chatController.listMsg(messageParams);
+                openVO.setMessageVOList(voList);
+                sendMessage.setSuseUuid(params.getsSuseUuid());
+                sendMessage.setMessAction(1);
+                sendMessage.setMessObject(openVO);
+                List<ChatUser> userList = messageService.selectChatUserByChatUuid(openVO.getChatUuid());
                 //返回会话开启消息
-                if (openVO != null) {
-                    //返回会话创建消息
-                    sendWebSocket(message, sessionUtil.getChannel(openVO.getChatCsuseUuid()));
+//                if (openVO != null) {
+//
+//                    //返回会话消息
+//                    sendWebSocket(sendMessage, ctx.channel());
+//                }
+                for (ChatUser user : userList) {
+                    Channel channel = sessionUtil.getChannel(user.getCuseSuseUuid());
+                    if (channel == null) {
+                        return;
+                    }
+                    sendWebSocket(sendMessage, channel);
                 }
             }
             //消息发送
@@ -278,7 +295,6 @@ public class MyHandler extends SimpleChannelInboundHandler<Object> {
                 MessageParams params = JSON.parseObject(messMain, MessageParams.class);
                 //保存消息到数据库
                 messageService.insertMessageAndUpdateChat(params, currTime);
-                message.setMessAction(2);
                 MessageVO vo = new MessageVO();
                 vo.setMessStatus(com.zhkj.nettyserver.message.domain.Message.SUCCESS);
                 vo.setMessChatUuid(params.getMessChatUuid());
@@ -286,29 +302,39 @@ public class MyHandler extends SimpleChannelInboundHandler<Object> {
                 vo.setMessContentType(params.getMessContentType());
                 vo.setMessDate(currTime.getTime());
                 vo.setMessSuseUuid(params.getMessSuseUuid());
-                message.setMessObject(vo);
+                ChatUser sChatUser = this.messageService.selectChatUserByChatUuidAndSuseUuid(params.getMessChatUuid(), params.getMessSuseUuid());
+                vo.setMessSuseName(sChatUser == null ? "未知" : sChatUser.getCuseName());
+                sendMessage.setMessObject(vo);
+                sendMessage.setMessAction(2);
                 List<ChatUser> userList = messageService.selectChatUserByChatUuid(params.getMessChatUuid());
                 //发送消息给此会话中的每个人
                 for (ChatUser user : userList) {
-                    Channel channel = sessionUtil.getChannel(user.getCuseUuid());
-                    sendWebSocket(message, channel);
+//                    System.out.println(sessionUtil.getChannelGroup(ctx).size() + "===============================================");
+//
+//                    System.out.println(user.getCuseUuid() + "====================user.getCuseUuid()");
+                    Channel channel = sessionUtil.getChannel(user.getCuseSuseUuid());
+                    sendWebSocket(sendMessage, channel);
                 }
             }
             //获取最近会话
             if (message.getMessAction() == 3) {
                 List<ChatVO> list = chatController.list(message.getSuseUuid());
                 sendMessage.setMessObject(list);
+                System.out.println(sessionUtil.getSession(ctx.channel()).getSuseUuid() + "====================================");
+                ChatUser sChatUser = this.messageService.selectChatUserByChatUuidAndSuseUuid(list.get(0).getChatUuid(), sessionUtil.getSession(ctx.channel()).getSuseUuid());
+                System.out.println(sChatUser.getCuseName());
                 sendMessage.setMessAction(3);
                 sendWebSocket(sendMessage, sessionUtil.getChannel(message.getSuseUuid()));
             }
             //拉取好友
             if (message.getMessAction() == 4) {
                 List<UserVO> listFriend = chatController.listFriend(message.getSuseUuid());
+                System.out.println(listFriend.get(0).getCreateTime() + "=================" + listFriend.get(0).getUpdateTime());
                 sendMessage.setMessObject(listFriend);
                 sendMessage.setMessAction(4);
                 sendWebSocket(sendMessage, sessionUtil.getChannel(message.getSuseUuid()));
             }
-            //拉取群
+            //拉取群信息
             if (message.getMessAction() == 5) {
                 List<ChatGroupVO> groupList = chatController.listGroup2(message.getSuseUuid());
                 sendMessage.setMessObject(groupList);
@@ -320,17 +346,17 @@ public class MyHandler extends SimpleChannelInboundHandler<Object> {
                 String messMain = message.getMessMain();
                 SearchMessageParams params = JSON.parseObject(messMain, SearchMessageParams.class);
                 List<SearchMessageVO> voList = chatController.listMsg(params);
-                message.setMessObject(voList);
-                message.setMessAction(6);
-                sendWebSocket(message, ctx.channel());
+                sendMessage.setMessObject(voList);
+                sendMessage.setMessAction(6);
+                sendWebSocket(sendMessage, ctx.channel());
             }
             //修改群名片
             if (message.getMessAction() == 7) {
-                EditChatGroupUserParams params=JSON.parseObject(message.getMessMain(),EditChatGroupUserParams.class);
+                EditChatGroupUserParams params = JSON.parseObject(message.getMessMain(), EditChatGroupUserParams.class);
                 String retu = chatController.editGroupUser(params);
-                message.setMessAction(8);
-                message.setMessObject(retu);
-                sendWebSocket(message,ctx.channel());
+                sendMessage.setMessAction(8);
+                sendMessage.setMessObject(retu);
+                sendWebSocket(sendMessage, ctx.channel());
             }
             //修改群
             if (message.getMessAction() == 8) {
@@ -338,25 +364,25 @@ public class MyHandler extends SimpleChannelInboundHandler<Object> {
                 Long suseUuid = sessionUtil.getSession(ctx.channel()).getSuseUuid();
                 EditChatGroupParams params = JSON.parseObject(message.getMessMain(), EditChatGroupParams.class);
                 String resu = chatController.editGroup(params, suseUuid);
-                message.setMessObject(resu);
-                message.setMessAction(8);
-                sendWebSocket(message,ctx.channel());
+                sendMessage.setMessObject(resu);
+                sendMessage.setMessAction(8);
+                sendWebSocket(sendMessage, ctx.channel());
             }
             //创建群
-            if (message.getMessAction()==9){
+            if (message.getMessAction() == 9) {
                 OpenGroupParams2 params2 = JSON.parseObject(message.getMessMain(), OpenGroupParams2.class);
                 OpenGroupVO vo = chatController.openGroup2(params2);
-                message.setMessAction(9);
-                message.setMessObject(vo);
-                sendWebSocket(message,ctx.channel());
+                sendMessage.setMessAction(9);
+                sendMessage.setMessObject(vo);
+                sendWebSocket(sendMessage, ctx.channel());
             }
             //退出群
-            if (message.getMessAction()==10){
-                OutGroupParams params=JSON.parseObject(message.getMessMain(), OutGroupParams.class);
+            if (message.getMessAction() == 10) {
+                OutGroupParams params = JSON.parseObject(message.getMessMain(), OutGroupParams.class);
                 String resu = chatController.outGroup(params);
-                message.setMessObject(resu);
-                message.setMessAction(10);
-                sendWebSocket(message,ctx.channel());
+                sendMessage.setMessObject(resu);
+                sendMessage.setMessAction(10);
+                sendWebSocket(sendMessage, ctx.channel());
             }
 
         }
@@ -366,7 +392,10 @@ public class MyHandler extends SimpleChannelInboundHandler<Object> {
      * WebSocket返回
      */
     public void sendWebSocket(Message message, Channel channel) throws Exception {
-        //发送消息
+        //发送消息  如果管道组中没有
+        if (channel==null){
+            ctx.channel().writeAndFlush(new TextWebSocketFrame("连接异常"));
+        }
         channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(message)));
     }
 

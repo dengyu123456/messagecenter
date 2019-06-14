@@ -10,6 +10,8 @@
 
 package com.zhkj.nettyserver.message.domain.respone;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
@@ -27,14 +29,17 @@ public class OutGroupVo {
 
     @ApiModelProperty(value = "",notes = "退出群的用户Uuid/t",example = "")
     @NotNull(message = "请指定退出群的用户")
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgusSuseUuid;
 
     @ApiModelProperty(value = "",notes = "群号码Uuid/t",example = "")
     @NotNull(message = "请指定群号码")
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgusCgroUuid;
 
     @ApiModelProperty(value = "",notes = "群chatUuid/t",example = "")
     @NotNull(message = "请指定群chatUuid")
+    @JSONField(serializeUsing = ToStringSerializer.class)
     private Long groupChatUuid;
 
     public Long getGroupChatUuid() {
