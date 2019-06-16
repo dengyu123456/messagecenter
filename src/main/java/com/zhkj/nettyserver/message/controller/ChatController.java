@@ -5,24 +5,25 @@ package com.zhkj.nettyserver.message.controller;///**
 // * Information and shall use it only in accordance with the terms of the
 // * license agreement you entered into with ZHONGHENG.
 // */
- import com.zhkj.nettyserver.message.domain.*;
- import com.zhkj.nettyserver.message.domain.request.*;
- import com.zhkj.nettyserver.message.domain.respone.*;
- import com.zhkj.nettyserver.message.service.MessageService;
- import com.zhkj.nettyserver.util.BeanUtil;
- import com.zhkj.nettyserver.util.token.TokenUtil;
- import com.zhkj.nettyserver.util.token.TokenVO;
- import io.swagger.annotations.Api;
+
+import com.zhkj.nettyserver.message.domain.*;
+import com.zhkj.nettyserver.message.domain.request.*;
+import com.zhkj.nettyserver.message.domain.respone.*;
+import com.zhkj.nettyserver.message.service.MessageService;
+import com.zhkj.nettyserver.util.BeanUtil;
+import com.zhkj.nettyserver.util.token.TokenUtil;
+import com.zhkj.nettyserver.util.token.TokenVO;
+import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
- import org.apache.ibatis.annotations.Lang;
- import org.springframework.beans.factory.annotation.Autowired;
- import org.springframework.stereotype.Component;
- import org.springframework.stereotype.Controller;
+import org.apache.ibatis.annotations.Lang;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
- import sun.applet.Main;
+import sun.applet.Main;
 
- import javax.validation.Valid;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,7 +50,7 @@ public class ChatController {
     @ApiOperation(value = "创建一个会话", notes = "", response = OpenVO.class)
 //    @RequestMapping(value = "/open", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 //    @ResponseBody
-    public OpenVO openChat(OpenParams params) {
+    public OpenVO openChat(OpenParams params, Long userUuid) {
         if (params.getChatType() == 0) {//系统会话
             Chat tmp = new Chat();
             tmp.setChatCsuseUuid(params.getsSuseUuid());
@@ -71,7 +72,17 @@ public class ChatController {
                 chat = this.messageService.insertChat(params);
             }
             OpenVO vo = new OpenVO();
+            User user0 = this.messageService.selectUserByUserUuid(chat.getChatCsuseUuid());
+            User user1 = this.messageService.selectUserByUserUuid(chat.getChatEsuseUuid());
+//            设置会话会话创建者用户
+            vo.setChatCsuseName(user0 == null ? "未知" : user0.getUserName());
+//            设置会话名字为对方姓名
             BeanUtil.copyProperties(chat, vo);
+            if (user0.getUserUuid() == userUuid) {
+                vo.setChatName(user1 == null ? "未知" : user1.getUserName());
+            } else {
+                vo.setChatName(user0 == null ? "未知" : user0.getUserName());
+            }
             return vo;
         } else if (params.getChatType() == 2) {
             if (params.getCgroUuid() == null) {
@@ -81,17 +92,17 @@ public class ChatController {
             if (chatGroup == null) {
                 return null;
             }
-            Chat chat =null;
-            if (chatGroup.getCgroChatUuid() == null){
+            Chat chat = null;
+            if (chatGroup.getCgroChatUuid() == null) {
                 chat = this.messageService.insertChat(params);
                 chatGroup.setCgroChatUuid(chat.getChatUuid());
                 this.messageService.updateChatGroup(chatGroup);
-            }else{
+            } else {
                 Chat tmpParams = new Chat();
                 tmpParams.setChatUuid(chatGroup.getCgroChatUuid());
                 chat = this.messageService.selectChatOne(tmpParams);
             }
-            if (chat == null){
+            if (chat == null) {
                 return null;
             }
             OpenVO vo = new OpenVO();
@@ -111,7 +122,7 @@ public class ChatController {
     @ApiOperation(value = "获取最近聊天的会话（没有分页）", notes = "", response = ChatVO.class)
 //    @RequestMapping(value = "/list", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 //    @ResponseBody
-    public  List<ChatVO> list(Long suseUuid) {
+    public List<ChatVO> list(Long suseUuid) {
         boolean isAll = false;
         List<Chat> chatList = this.messageService.selectChatBySuseUuid(suseUuid, isAll);
         List<ChatVO> voList = new ArrayList<ChatVO>();
@@ -146,7 +157,7 @@ public class ChatController {
         if (user == null) {
             return null;
         }
-        List<User> userList = this.messageService.selectUserByEnteUuid(user.getUserEnteUuid(), false,suseUuid);
+        List<User> userList = this.messageService.selectUserByEnteUuid(user.getUserEnteUuid(), false, suseUuid);
         List<UserVO> voList = new ArrayList<UserVO>();
         if (!CollectionUtils.isEmpty(userList)) {
             for (User item : userList) {
@@ -229,6 +240,9 @@ public class ChatController {
                 ChatGroupVO vo = new ChatGroupVO();
                 BeanUtil.copyProperties(chat, vo);
                 user = this.messageService.selectBySuseUuid(chat.getCgroCsuseUuid(), true);
+                //获取群成员的并返回
+                List<ChatGroupUser> chatGroupUserList = this.messageService.selectChatGroupUser(chat.getCgroUuid());
+                vo.setChatGroupUserList(chatGroupUserList);
                 vo.setCgroCsuseName(user == null ? "未知" : user.getUserName());
                 voList.add(vo);
             }
@@ -244,17 +258,31 @@ public class ChatController {
     @ApiOperation(value = "", notes = "退出群")
 //    @RequestMapping(value = "/out/group", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 //    @ResponseBody
-    public String outGroup(OutGroupParams params) {
+    public OutGroupVo outGroup(OutGroupParams params) {
         /**
          * 本身才能退出
          * 群人数需要减少
          * 退出会话
          * 会话总人数减少
          */
-       if (0<this.messageService.outGroup(params)){
-           return "已退出该群";
-       }
-      return "退出失败，未知错误";
+//        if (0 < this.messageService.outGroup(params)) {
+////            return "已退出该群";
+////        }
+////        return "退出失败，未知错误";
+        Long chatGroupChatUuid = null;
+        List<ChatGroupUser> chatGroupUserList = this.messageService.selectChatGroupUser(params.getCgusCgroUuid());
+        try {
+            User user = this.messageService.selectUserByUserUuid(params.getCgusSuseUuid());
+            chatGroupChatUuid = this.messageService.outGroup(params);
+        } catch (Exception e) {
+//            LOGGER.info(e.getMessage());
+//            this.send(principal.getName(), ResponseStompFactory.createOk("退群失败", "outGroup"));
+            return null;
+        }
+        OutGroupVo vo = new OutGroupVo();
+        BeanUtil.copyProperties(params,vo);
+        vo.setGroupChatUuid(chatGroupChatUuid);
+        return vo;
     }
 
     /**
@@ -265,7 +293,7 @@ public class ChatController {
     @ApiOperation(value = "", notes = "增加群成员")
 //    @RequestMapping(value = "/add/group", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 //    @ResponseBody
-    public String addGroup(AddChatGroupUserParams params) {
+    public List<ChatGroupVO> addGroup(AddChatGroupUserParams params) {
         /**
          * 增加人
          * 群和增加人在同一个圈里面
@@ -274,29 +302,59 @@ public class ChatController {
          * 增加会话人
          * 会话人数需要增加
          */
+        List<ChatGroupVO> voList = new ArrayList<ChatGroupVO>();
+        try {
+            int count = this.messageService.addChatGroupUser(params);
+        } catch (Exception e) {
+          return null;
+        } finally {
+            ChatGroup cGroup = this.messageService.selectChatGroupByCgroUuid(params.getCgusCgroUuid());
 
-      if (0<this.messageService.addChatGroupUser(params)) {
-          return "新增成功";
-      }return "新增失败";
+            if (cGroup != null) {
+                User user = null;
+                ChatGroup chat = cGroup;
+                ChatGroupVO vo = new ChatGroupVO();
+                BeanUtil.copyProperties(chat, vo);
+//                获取群成员的并返回
+                List<ChatGroupUser> chatGroupUserList = this.messageService.selectChatGroupUser(chat.getCgroUuid());
+                vo.setChatGroupUserList(chatGroupUserList);
+                user = this.messageService.selectBySuseUuid(chat.getCgroCsuseUuid(), true);
+                vo.setCgroCsuseName(user == null ? "未知" : user.getUserName());
+                voList.add(vo);
+            }
+        }
+//        this.send(principal.getName(), ResponseStompFactory.createOk("新增成功", "addGroup"));
+        return voList;
     }
 
-//    /**
+    //    /**
 //     * 删除群成员
 //     *
 //     * @param reqOb
 //     */
-//    @ApiOperation(value = "", notes = "删除群成员")
+ @ApiOperation(value = "", notes = "删除群成员")
 //    @RequestMapping(value = "/del/group", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 //    @ResponseBody
-//    public Response delGroup(@RequestBody @Valid Request<DelChatGroupUserParams> reqOb) {
-//        DelChatGroupUserParams params = reqOb.getParams();
-////        通过主键删除群成员
-//        if(this.messageService.deleteChatGroupUserByCgusUuid(params) == 0) {
-//           return ResponseFactory.createBad("删除失败");
-//        }else {
-//            return ResponseFactory.createOk("删除成功");
-//        }
-//    }
+    public List<ChatGroupVO> delGroup(DelChatGroupUserParams params) {
+//        通过主键删除群成员
+        int count[] = this.messageService.deleteChatGroupUserByCgusUuid(params);
+        ChatGroup cGroup = this.messageService.selectChatGroupByCgroUuid(params.getCgroUuid());
+        List<ChatGroupVO> voList = new ArrayList<ChatGroupVO>();
+        if (cGroup != null) {
+            User user = null;
+            ChatGroup chat = cGroup;
+            ChatGroupVO vo = new ChatGroupVO();
+            BeanUtil.copyProperties(chat, vo);
+//                获取群成员的并返回
+            List<ChatGroupUser> chatGroupUserList = this.messageService.selectChatGroupUser(chat.getCgroUuid());
+            vo.setChatGroupUserList(chatGroupUserList);
+            user = this.messageService.selectBySuseUuid(chat.getCgroCsuseUuid(), true);
+            vo.setCgroCsuseName(user == null ? "未知" : user.getUserName());
+            voList.add(vo);
+            return voList;
+        }
+        return null;
+    }
 
     /**
      * 修改群
@@ -306,13 +364,13 @@ public class ChatController {
     @ApiOperation(value = "", notes = "修改群")
 //    @RequestMapping(value = "/edit/group", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 //    @ResponseBody
-    public String editGroup(EditChatGroupParams params,Long suseUuid) {
+    public String editGroup(EditChatGroupParams params, Long suseUuid) {
 
-        int updateCount = this.messageService.updateChatGroup(params,suseUuid.toString());
+        int updateCount = this.messageService.updateChatGroup(params, suseUuid.toString());
         if (updateCount == 1) {
             return "修改群成功";
         } else {
-            return"修改群失败";
+            return "修改群失败";
         }
     }
 
@@ -325,9 +383,9 @@ public class ChatController {
 //    @RequestMapping(value = "/edit/group/user", method = RequestMethod.POST, produces = "application/json;charset=UTF-8")
 //    @ResponseBody
     public String editGroupUser(EditChatGroupUserParams params) {
-        if(this.messageService.updateChatGroupUserByCgusUuid(params) <1 ){
-            return"修改群名片失败";
-        }else {
+        if (this.messageService.updateChatGroupUserByCgusUuid(params) < 1) {
+            return "修改群名片失败";
+        } else {
             return "修改群名片成功";
         }
     }

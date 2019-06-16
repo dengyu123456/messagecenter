@@ -59,8 +59,6 @@ public class ChatGroupVO {
 
     @ApiModelProperty(value = "", notes = "群成员数列表", example = "")
     List<ChatGroupUser> chatGroupUserList;
-
-
     /**
      * 创建时间
      */
