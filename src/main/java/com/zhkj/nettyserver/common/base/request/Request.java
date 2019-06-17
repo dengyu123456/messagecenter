@@ -7,12 +7,6 @@
  */
 package com.zhkj.nettyserver.common.base.request;
 
-import com.alibaba.fastjson.JSON;
-import com.zhkj.nettyserver.netty.Message;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-
 /**
  * Des: 请求参数的统一对象
  * ClassName: Request
@@ -20,28 +14,21 @@ import javax.validation.constraints.NotNull;
  * Date: 2018/7/4
  * Time: 15:28
  */
-public class Request<T> {
+public class Request {
     //请求参数
-    @Valid
-    @NotNull(message = "参数不能为空")
-    private T params;
+    private String params;
     //版本号
     private String version;
     //请求时间
     private Long time;
-    //加盐校验码
-    private String check;
-    /*关于分页*/
-    //分页大小
-    private Integer pageSize;
-    //页码
-    private Integer page;
+    //请求方法
+    private String action;
 
-    public T getParams() {
+    public String getParams() {
         return params;
     }
 
-    public void setParams(T params) {
+    public void setParams(String params) {
         this.params = params;
     }
 
@@ -61,28 +48,12 @@ public class Request<T> {
         this.time = time;
     }
 
-    public String getCheck() {
-        return check;
+    public String getAction() {
+        return action;
     }
 
-    public void setCheck(String check) {
-        this.check = check;
-    }
-
-    public Integer getPageSize() {
-        return pageSize;
-    }
-
-    public void setPageSize(Integer pageSize) {
-        this.pageSize = pageSize;
-    }
-
-    public Integer getPage() {
-        return page;
-    }
-
-    public void setPage(Integer page) {
-        this.page = page;
+    public void setAction(String action) {
+        this.action = action;
     }
 
 }

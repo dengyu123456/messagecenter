@@ -8,6 +8,6 @@ import io.netty.util.AttributeKey;
  * time:2019年6月11日 10:31:17
  */
 public interface Attributes {
-    AttributeKey<Boolean> LOGIN=AttributeKey.valueOf("LOGIN");
-    AttributeKey<Session> SESSION=AttributeKey.valueOf("SESSION");
+    AttributeKey<Boolean> LOGIN = AttributeKey.valueOf("LOGIN");
+    AttributeKey<Long> SESSION = AttributeKey.valueOf("SESSION");
 }

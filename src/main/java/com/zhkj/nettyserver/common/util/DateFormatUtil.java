@@ -5,16 +5,16 @@
  * Information and shall use it only in accordance with the terms of the
  * license agreement you entered into with ZHONGHENG.
  */
-package com.zhkj.nettyserver.util;
+package com.zhkj.nettyserver.common.util;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.time.DateFormatUtils;
 
 /**
  * Des:
- * ClassName: StringUtil
+ * ClassName: DateFormatUtil
  * Author: biqiang2017@163.com
  * Date: 2018/8/30
- * Time: 2:21
+ * Time: 22:43
  */
-public class StringUtil extends StringUtils{
+public class DateFormatUtil extends DateFormatUtils {
 }

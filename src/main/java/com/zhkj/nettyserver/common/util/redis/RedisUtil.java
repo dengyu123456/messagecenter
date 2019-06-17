@@ -5,10 +5,10 @@
  * Information and shall use it only in accordance with the terms of the
  * license agreement you entered into with ZHONGHENG.
  */
-package com.zhkj.nettyserver.util.redis;
+package com.zhkj.nettyserver.common.util.redis;
 
 import com.alibaba.fastjson.JSON;
-import com.zhkj.nettyserver.util.StringUtil;
+import com.zhkj.nettyserver.common.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

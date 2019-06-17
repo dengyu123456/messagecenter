@@ -11,7 +11,7 @@ import com.zhkj.nettyserver.message.dao.*;
 import com.zhkj.nettyserver.message.domain.*;
 import com.zhkj.nettyserver.message.domain.request.*;
 import com.zhkj.nettyserver.message.service.MessageService;
-import com.zhkj.nettyserver.util.UuidUtil;
+import com.zhkj.nettyserver.common.util.UuidUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -264,7 +264,8 @@ public class MessageServiceImpl implements MessageService {
         if (!isAll) {
             params.setUserDataStatus(0);
         }
-        return this.userMapper.selectByExample(Example.builder(User.class).andWhere(Sqls.custom().andEqualTo("userEnteUuid",userEnteUuid).andEqualTo("userType",0).andEqualTo("userDataStatus",params.getUserDataStatus()).andNotEqualTo("userUuid",suseUuid)).build());
+        List<User> userList = this.userMapper.selectByExample(Example.builder(User.class).andWhere(Sqls.custom().andEqualTo("userEnteUuid", userEnteUuid).andEqualTo("userType", 0).andEqualTo("userDataStatus", params.getUserDataStatus()).andNotEqualTo("userUuid", suseUuid)).build());
+        return userList;
 //        return this.userMapper.select(params);
     }
 

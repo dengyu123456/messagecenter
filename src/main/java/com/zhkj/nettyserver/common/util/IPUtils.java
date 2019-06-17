@@ -1,4 +1,4 @@
-package com.zhkj.nettyserver.util;
+package com.zhkj.nettyserver.common.util;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

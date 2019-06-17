@@ -1,4 +1,4 @@
-package com.zhkj.nettyserver.util;
+package com.zhkj.nettyserver.common.util;
 
 import java.util.Random;
 import java.util.UUID;

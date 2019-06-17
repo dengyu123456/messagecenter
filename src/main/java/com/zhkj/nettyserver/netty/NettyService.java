@@ -24,7 +24,7 @@ public class NettyService {
                 ServerBootstrap serverBootstrap = new ServerBootstrap();
                 serverBootstrap.group(bossGroup, workerGroup)
                         .channel(NioServerSocketChannel.class)
-                        .childHandler(new MyChannelInitializer());
+                        .childHandler(new CustomChannelInitializer());
                 Channel channel = serverBootstrap.bind(9099).sync().channel();
                 channel.closeFuture().sync();
             } catch (Exception e) {

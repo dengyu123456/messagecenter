@@ -5,12 +5,11 @@
  * Information and shall use it only in accordance with the terms of the
  * license agreement you entered into with ZHONGHENG.
  */
-package com.zhkj.nettyserver.util.token;
+package com.zhkj.nettyserver.common.base;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.zhkj.nettyserver.util.AESUtil;
-import com.zhkj.nettyserver.util.Base64Util;
+import com.zhkj.nettyserver.common.util.AESUtil;
+import com.zhkj.nettyserver.common.util.Base64Util;
 
 /**
  * Des:

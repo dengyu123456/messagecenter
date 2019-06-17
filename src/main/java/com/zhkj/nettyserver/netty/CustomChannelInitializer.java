@@ -12,7 +12,7 @@ import io.netty.handler.stream.ChunkedWriteHandler;
  * time：2019年6月10日 17:19:46
  * 组装handler
  */
-public class MyChannelInitializer extends ChannelInitializer {
+public class CustomChannelInitializer extends ChannelInitializer {
 
     @Override
     protected void initChannel(Channel channel) throws Exception {
@@ -21,7 +21,7 @@ public class MyChannelInitializer extends ChannelInitializer {
         pipeline.addLast("http-codec", new HttpServerCodec()); // Http消息编码解码
         pipeline.addLast("aggregator", new HttpObjectAggregator(65536)); // Http消息组装
         pipeline.addLast("http-chunked", new ChunkedWriteHandler()); // WebSocket通信支持
-        pipeline.addLast("handler", new MyHandler());//自定义handler
+        pipeline.addLast("handler", new CustomHandler());//自定义handler
 
     }
 }

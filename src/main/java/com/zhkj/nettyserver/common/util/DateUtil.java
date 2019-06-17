@@ -5,7 +5,7 @@
  * Information and shall use it only in accordance with the terms of the
  * license agreement you entered into with ZHONGHENG.
  */
-package com.zhkj.nettyserver.util;
+package com.zhkj.nettyserver.common.util;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

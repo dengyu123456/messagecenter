@@ -5,7 +5,7 @@
  * Information and shall use it only in accordance with the terms of the
  * license agreement you entered into with ZHONGHENG.
  */
-package com.zhkj.nettyserver.util.redis;
+package com.zhkj.nettyserver.common.util.redis;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
