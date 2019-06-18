@@ -17,7 +17,7 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 public class NettyService {
 
     public NettyService() {
-            System.out.println("启动Netty!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            System.out.println("启动Netty!");
             EventLoopGroup bossGroup = new NioEventLoopGroup();
             EventLoopGroup workerGroup = new NioEventLoopGroup();
             try {
@@ -25,6 +25,7 @@ public class NettyService {
                 serverBootstrap.group(bossGroup, workerGroup)
                         .channel(NioServerSocketChannel.class)
                         .childHandler(new CustomChannelInitializer());
+//                        .childHandler(CustomHandler.getInstance());
                 Channel channel = serverBootstrap.bind(9099).sync().channel();
                 channel.closeFuture().sync();
             } catch (Exception e) {

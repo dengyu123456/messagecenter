@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChannelUtil {
     private ConcurrentHashMap<Long, Channel> chalMap = null;
 
-    public ChannelUtil() {
+    private ChannelUtil() {
         this.chalMap = new ConcurrentHashMap<>();
     }
 
@@ -63,7 +63,7 @@ public class ChannelUtil {
         return chalMap.get(suseUuid);
     }
 
-    //获取管道
+    //获取管道组
     public ChannelGroup getChannelGroup(ChannelHandlerContext ctx) {
         ChannelGroup channelGroup = new DefaultChannelGroup(ctx.executor());
         for (Channel item : chalMap.values()){

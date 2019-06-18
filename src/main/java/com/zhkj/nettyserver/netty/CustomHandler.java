@@ -10,25 +10,18 @@ import com.zhkj.nettyserver.common.base.respone.ResponseStompFactory;
 import com.zhkj.nettyserver.common.util.BeanUtil;
 import com.zhkj.nettyserver.common.util.SpringUtil;
 import com.zhkj.nettyserver.common.util.StringUtil;
-import com.zhkj.nettyserver.message.controller.ChatController;
 import com.zhkj.nettyserver.message.domain.*;
-import com.zhkj.nettyserver.message.domain.Message;
 import com.zhkj.nettyserver.message.domain.request.*;
 import com.zhkj.nettyserver.message.domain.respone.*;
 import com.zhkj.nettyserver.message.service.MessageService;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
-import io.netty.handler.codec.http.DefaultFullHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
-import io.netty.handler.codec.http.FullHttpResponse;
-import io.netty.handler.codec.http.HttpHeaders;
+import io.netty.handler.codec.http.*;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.CharsetUtil;
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 
-import javax.script.ScriptEngine;
-import java.security.Principal;
 import java.util.*;
 
 import static io.netty.handler.codec.http.HttpHeaders.Names.*;
@@ -38,24 +31,30 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 /**
  * @author dengyi
  * time:2019年6月11日 10:31:17
- * 自定义的Handler
+ * 自定义的Handler  多个channel共享handler
  */
+@ChannelHandler.Sharable
 public class CustomHandler extends SimpleChannelInboundHandler<Object> {
 
-    // private  final Map<String, Channel> userIdChannelMap = new ConcurrentHashMap<>();
+    private MessageService messageService;
 
-    //private static final SubscribeMessage subscribeMessage = SpringUtil.getBean(SubscribeMessage.class);
+    private static CustomHandler INSTANCE = new CustomHandler();
 
-    private MessageService messageService = (MessageService) SpringUtil.getBean("messageService");
+    public static CustomHandler getInstance() {
+        return INSTANCE ;
+    }
 
-//    private ChatController chatController = (ChatController) SpringUtil.getBean("chatController");
+    //单例模式
+    private CustomHandler() {
+        messageService = (MessageService) SpringUtil.getBean("messageService");
+    }
 
     @Override
-    protected void messageReceived(ChannelHandlerContext ctx, Object o) throws Exception {
-        if (o instanceof FullHttpRequest) { // 添加传统的HTTP接入
-            handleHttpRequest(ctx, (FullHttpRequest) o);
-        } else if (o instanceof WebSocketFrame) { // WebSocket接入
-            handleWebSocketFrame(ctx, (WebSocketFrame) o);
+    protected void channelRead0(ChannelHandlerContext ctx, Object msg) throws Exception {
+        if (msg instanceof FullHttpRequest) { // 添加传统的HTTP接入
+            handleHttpRequest(ctx, (FullHttpRequest) msg);
+        } else if (msg instanceof WebSocketFrame) { // WebSocket接入
+            handleWebSocketFrame(ctx, (WebSocketFrame) msg);
         }
     }
 
@@ -67,11 +66,6 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
         ctx.close();
-    }
-
-    @Override
-    public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-        super.close(ctx, promise);
     }
 
     /**
@@ -91,18 +85,28 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
             sendHttpResponse(ctx, request, new DefaultFullHttpResponse(HTTP_1_1, BAD_REQUEST));
             return;
         }
-        String tokenStr = request.headers().get(HttpHeaders.Names.AUTHORIZATION);
-        if (StringUtil.isBlank(tokenStr)) {//token 不存在
+
+        WebSocketServerHandshakerFactory wsFactory = new WebSocketServerHandshakerFactory("http://" + request.headers().get(HttpHeaders.Names.HOST), null, false);
+        WebSocketServerHandshaker handshaker = wsFactory.newHandshaker(request);
+        if (handshaker == null) { // 无法处理的websocket版本
             WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
-        } else {
-            TokenVO vo = TokenUtil.getToken(tokenStr);
-            if (vo == null) {
+        } else { // 向客户端发送websocket握手,完成握手
+            String tokenStr = request.headers().get(HttpHeaders.Names.AUTHORIZATION);
+            if (StringUtil.isBlank(tokenStr)) {//token 不存在
                 WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
-            } else if (vo.getOt() - System.currentTimeMillis() > 24 * 60 * 60 * 1000 * 7) {
-                WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
-            } else {//没有问题
-                ChannelUtil.getInstance().bindChannel(Long.valueOf(vo.getUuid()), ctx.channel());
+            } else {
+                TokenVO vo = TokenUtil.getToken(tokenStr);
+                if (vo == null) {
+                    WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
+                } else if (vo.getOt() - System.currentTimeMillis() > 24 * 60 * 60 * 1000 * 7) {
+                    WebSocketServerHandshakerFactory.sendUnsupportedWebSocketVersionResponse(ctx.channel());
+                } else {//没有问题
+                    ChannelUtil.getInstance().bindChannel(Long.valueOf(vo.getUuid()), ctx.channel());
+                }
             }
+           // 正常WebSocket的Http连接请求，构造握手响应返回
+            handshaker.handshake(ctx.channel(), request);
+
         }
     }
 
@@ -151,6 +155,10 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
             ctx.channel().write(new PongWebSocketFrame(frame.content().retain()));
         } else if (frame instanceof TextWebSocketFrame) {
             String text = ((TextWebSocketFrame) frame).text();
+
+//        if (this.handshaker == null || ctx == null || ctx.isRemoved()) {
+//            throw new Exception("尚未握手成功，无法向客户端发送WebSocket消息");
+//        }
             Request reqOb = JSON.parseObject(text, Request.class);
             System.out.println(reqOb.getAction());
             //发送消息
@@ -192,12 +200,15 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
         //参数校验
         if (smpa.getMessChatUuid() == null) {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定会话", "listMsg"));
+            return;
         }
         if (smpa.getMessEndDate() == null) {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定消息结束时间", "listMsg"));
+            return;
         }
         if (smpa.getMessStartDate() == null) {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定消息开始时间", "listMsg"));
+            return;
         }
 
         List<Message> messageList = this.messageService.selectMessage(smpa);
@@ -227,22 +238,25 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
 
         if (egup.getCgusCgroUuid() == null) {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定群的Uuid", "editGroupUser"));
+            return;
         }
         if (egup.getCgusName() == null) {
-            sendWebSocket(channel, ResponseStompFactory.createBad("请指定会话成员名片", "editGroupUser"));
+            sendWebSocket(channel, ResponseStompFactory.createBad("请指定成员名片", "editGroupUser"));
+            return;
         }
         if (egup.getCgusUuid() == null) {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定群成员Uuid", "editGroupUser"));
+            return;
         }
 
         List<ChatGroupUser> chatGroupUserList = this.messageService.selectChatGroupUser(egup.getCgusCgroUuid());
         if (this.messageService.updateChatGroupUserByCgusUuid(egup) < 1) {
             sendWebSocket(channel, ResponseStompFactory.createBad("修改群名片失败", "editGroupUser"));
         } else {
-            sendWebSocket(channel, ResponseStompFactory.createOk("修改群成员名片成功", "editGroupUser"));
+            sendWebSocket(channel, ResponseStompFactory.createOk("修改群名片成功", "editGroupUser"));
         }
         for (ChatGroupUser chatGroupUser : chatGroupUserList) {
-            sendWebSocket(ChannelUtil.getInstance().getChannel(chatGroupUser.getCgusSuseUuid()), ResponseStompFactory.createOk("修改群成员名片成功", "editGroupUser"));
+            sendWebSocket(ChannelUtil.getInstance().getChannel(chatGroupUser.getCgusSuseUuid()), ResponseStompFactory.createOk("修改群名片成功", "editGroupUser"));
         }
     }
 
@@ -255,6 +269,7 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
 
         if (ecgp.getCgroUuid() == null) {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定修改群Uuid", "editGroup"));
+            return;
         }
 
         this.messageService.updateChatGroup(ecgp, ChannelUtil.getInstance().getSuseUuid(channel).toString());
@@ -278,9 +293,11 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
 
         if (dgup.getCgroUuid() == null) {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定群号码Uuid", "delGroup"));
+            return;
         }
         if (dgup.getCgusUuid() == null) {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定群成员Uuid", "delGroup"));
+            return;
         }
 
 //        获取所有成员来通知删除
@@ -323,12 +340,15 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
 
         if (agup.getCgusSuseUuid() == null) {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定群参与用户Uuid", "addGroup"));
+            return;
         }
         if (agup.getUserUuid() == null) {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定被拉人Uuid", "addGroup"));
+            return;
         }
         if (agup.getCgusCgroUuid() == null) {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定群Uuid", "addGroup"));
+            return;
         }
 
         try {
@@ -373,10 +393,13 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
         }
         OutGroupParams ogpa = JSON.parseObject(params, OutGroupParams.class);
 
-        if (ogpa.getCgusSuseUuid()==null){
+        if (ogpa.getCgusSuseUuid() == null) {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定退出群的用户", "outGroup"));
-        }if (ogpa.getCgusCgroUuid()==null){
+            return;
+        }
+        if (ogpa.getCgusCgroUuid() == null) {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定群号码", "outGroup"));
+            return;
         }
 
         Long chatGroupChatUuid = null;
@@ -426,13 +449,19 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
             return;
         }
         OpenGroupParams2 ogp2 = JSON.parseObject(params, OpenGroupParams2.class);
-
-        if (ogp2.getCgorName()==null||ogp2.getCgorName().length()<1||ogp2.getCgorName().length()>64){
-            sendWebSocket(channel, ResponseStompFactory.createBad("会话名字<1~64位>", "openGroup2"));
-        }if (ogp2.getsSuseUuid()==null){
+        if (!StringUtil.isBlank(ogp2.getCgorName())) {
+            if (ogp2.getCgorName().length() < 1 || ogp2.getCgorName().length() > 64) {
+                sendWebSocket(channel, ResponseStompFactory.createBad("会话名字<1~64位>", "openGroup2"));
+                return;
+            }
+        }
+        if (ogp2.getsSuseUuid() == null) {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定创建群用户", "openGroup2"));
-        }if (ogp2.geteSuseUuid().isEmpty()||ogp2.geteSuseUuid().size()<1||ogp2.geteSuseUuid().size()>255){
+            return;
+        }
+        if (ogp2.geteSuseUuid().isEmpty() || ogp2.geteSuseUuid().size() < 1 || ogp2.geteSuseUuid().size() > 255) {
             sendWebSocket(channel, ResponseStompFactory.createBad("参与群用户<1~255人>", "openGroup2"));
+            return;
         }
 
         ChatGroup chatGroup = this.messageService.insertGroup(ogp2);
@@ -476,15 +505,17 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
             return;
         }
         MessageParams mpar = JSON.parseObject(params, MessageParams.class);
-
-        if (mpar.getMessChatUuid()==null){
-            sendWebSocket(channel, ResponseStompFactory.createBad("请指定会话", "chat"));
+        if (mpar.getMessContentType() == null) {
+            sendWebSocket(channel, ResponseStompFactory.createBad("请指定消息类型", "chat"));
+            return;
         }
-        if (mpar.getMessSuseUuid()==null){
-            sendWebSocket(channel, ResponseStompFactory.createBad("请指定会话", "chat"));
+        if (mpar.getMessSuseUuid() == null) {
+            sendWebSocket(channel, ResponseStompFactory.createBad("请指定会话用户Uuid", "chat"));
+            return;
         }
         if (mpar.getMessChatUuid() == null) {//没有会话
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定会话", "chat"));
+            return;
         } else {//有会话Uuid
             Chat chatParams = new Chat();
             chatParams.setChatUuid(mpar.getMessChatUuid());
@@ -522,6 +553,22 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
             return;
         }
         OpenParams opar = JSON.parseObject(params, OpenParams.class);
+
+        if (!StringUtil.isBlank(opar.getChatName())) {
+            if (opar.getChatName().length() <= 1 || opar.getChatName().length() > 64) {
+                sendWebSocket(channel, ResponseStompFactory.createBad("会话名字<1~64位>", "chatOpen"));
+                return;
+            }
+        }
+        if (opar.getChatType() == null || opar.getChatType() < 0 || opar.getChatType() > 2) {
+            sendWebSocket(channel, ResponseStompFactory.createBad("请指定会话类型<0~2>", "chatOpen"));
+            return;
+        }
+        if (opar.getsSuseUuid() == null) {
+            sendWebSocket(channel, ResponseStompFactory.createBad("请指定发起会话方", "chatOpen"));
+            return;
+        }
+
         if (opar.getChatType() == 0) {//系统会话
             Chat tmp = new Chat();
             tmp.setChatCsuseUuid(opar.getsSuseUuid());
@@ -637,8 +684,8 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
     }
 
     public void sendWebSocket(Channel channel, ResponseStomp res) {
-        if (channel != null) {
-            channel.writeAndFlush(res);
+        if (channel != null && channel.isActive()) {
+            channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(res)));
         }
     }
 

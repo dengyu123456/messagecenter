@@ -21,7 +21,7 @@ public class CustomChannelInitializer extends ChannelInitializer {
         pipeline.addLast("http-codec", new HttpServerCodec()); // Http消息编码解码
         pipeline.addLast("aggregator", new HttpObjectAggregator(65536)); // Http消息组装
         pipeline.addLast("http-chunked", new ChunkedWriteHandler()); // WebSocket通信支持
-        pipeline.addLast("handler", new CustomHandler());//自定义handler
+        pipeline.addLast("handler",CustomHandler.getInstance());//使用单例模式
 
     }
 }

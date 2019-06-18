@@ -8,8 +8,8 @@
 package com.zhkj.nettyserver.message.service.impl;
 
 import com.zhkj.nettyserver.common.util.redis.RedisUtil;
+import com.zhkj.nettyserver.message.domain.Message;
 import com.zhkj.nettyserver.netty.ChannelUtil;
-import com.zhkj.nettyserver.netty.Message;
 import io.netty.channel.Channel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -35,7 +35,7 @@ public class RedisService {
     public void msgMonitor(){
         while (true){
             Message message =  redisUtil.rpop("",Message.class);
-            if (message != null && message.getMessCgroUuid() != null){
+            if (message != null && message.getMessChatUuid() != null){
                 Channel channel = ChannelUtil.getInstance().getChannel(123L);
                 if (channel != null){
                     channel.writeAndFlush(message);

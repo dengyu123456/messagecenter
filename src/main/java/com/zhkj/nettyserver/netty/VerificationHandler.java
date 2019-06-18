@@ -12,16 +12,13 @@ import io.netty.util.Attribute;
 public class VerificationHandler extends SimpleChannelInboundHandler<Object> {
 
     @Override
-    protected void messageReceived(ChannelHandlerContext channel, Object o) throws Exception {
-
-        if(!this.verification(channel,o)){
-            channel.channel().close();
+    protected void channelRead0(ChannelHandlerContext ctx, Object o) throws Exception {
+        if(!this.verification(ctx,o)){
         }else {
-            channel.attr(Attributes.LOGIN).set(true);
+            ctx.attr(Attributes.LOGIN).set(true);
             //如果登陆认证成功，删掉连接上的登陆认证模块
-            channel.pipeline().remove(this);
+            ctx.pipeline().remove(this);
         }
-
     }
 
     private Boolean verification(ChannelHandlerContext channel, Object o){
