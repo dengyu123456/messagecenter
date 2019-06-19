@@ -67,6 +67,36 @@ public class MessageVO {
     @ApiModelProperty(value = "",notes = "消息内容",example = "")
     private String messContent;
 
+    private String messChatName;
+
+    private Integer messChatType;
+
+    private Integer messChatCount;
+
+    public String getMessChatName() {
+        return messChatName;
+    }
+
+    public void setMessChatName(String messChatName) {
+        this.messChatName = messChatName;
+    }
+
+    public Integer getMessChatType() {
+        return messChatType;
+    }
+
+    public void setMessChatType(Integer messChatType) {
+        this.messChatType = messChatType;
+    }
+
+    public Integer getMessChatCount() {
+        return messChatCount;
+    }
+
+    public void setMessChatCount(Integer messChatCount) {
+        this.messChatCount = messChatCount;
+    }
+
     public Integer getMessStatus() {
         return messStatus;
     }
