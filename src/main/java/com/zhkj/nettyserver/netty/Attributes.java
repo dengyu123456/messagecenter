@@ -10,4 +10,5 @@ import io.netty.util.AttributeKey;
 public interface Attributes {
     AttributeKey<Boolean> LOGIN = AttributeKey.valueOf("LOGIN");
     AttributeKey<Long> SESSION = AttributeKey.valueOf("SESSION");
+    AttributeKey<Long> ENTE = AttributeKey.valueOf("ENTE");
 }

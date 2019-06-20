@@ -31,16 +31,16 @@ public class RedisService {
     /**
      * redis消息监听
      */
-    @Async
-    public void msgMonitor(){
-        while (true){
-            Message message =  redisUtil.rpop("",Message.class);
-            if (message != null && message.getMessChatUuid() != null){
-                Channel channel = ChannelUtil.getInstance().getChannel(123L);
-                if (channel != null){
-                    channel.writeAndFlush(message);
-                }
-            }
-        }
-    }
+//    @Async
+//    public void msgMonitor(){
+//        while (true){
+//            Message message =  redisUtil.rpop("",Message.class);
+//            if (message != null && message.getMessChatUuid() != null){
+//                Channel channel = ChannelUtil.getInstance().getChannel(123L);
+//                if (channel != null){
+//                    channel.writeAndFlush(message);
+//                }
+//            }
+//        }
+//    }
 }
