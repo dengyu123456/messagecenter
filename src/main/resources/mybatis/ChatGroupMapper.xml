@@ -25,7 +25,7 @@
     UPDATE chat_group SET cgro_count = cgro_count-1 WHERE cgro_uuid = #{cgroCount} AND cgro_count > 0
     </update>
     <update id="updateAddCountByCgroUuid">
-    UPDATE chat_group SET cgro_count = cgro_count+1 WHERE cgro_uuid = #{cgusCgroUuid}
+    UPDATE chat_group SET cgro_count = cgro_count+1 WHERE cgro_uuid = #{cgroUuid}
     </update>
     <update id="updateChatGroupCountByChatGroupUuid">
     UPDATE chat_group SET cgro_count = cgro_count-#{length} WHERE cgro_uuid = #{cgroUuid} and cgro_count > 0

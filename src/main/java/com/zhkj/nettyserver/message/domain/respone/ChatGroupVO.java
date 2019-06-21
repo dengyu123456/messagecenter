@@ -59,12 +59,24 @@ public class ChatGroupVO {
 
     @ApiModelProperty(value = "", notes = "群成员数列表", example = "")
     List<ChatGroupUser> chatGroupUserList;
+
     /**
      * 创建时间
      */
     @ApiModelProperty(value = "", notes = "创建时间", example = "")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
+
+    //群修改之前的名字
+    private String oldCgroName;
+
+    public String getOldCgroName() {
+        return oldCgroName;
+    }
+
+    public void setOldCgroName(String oldCgroName) {
+        this.oldCgroName = oldCgroName;
+    }
 
     public Long getCgroUuid() {
         return cgroUuid;

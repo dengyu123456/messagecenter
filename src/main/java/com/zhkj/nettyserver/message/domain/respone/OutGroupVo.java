@@ -32,22 +32,25 @@ public class OutGroupVo {
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgusSuseUuid;
 
+    //用户姓名
+    private String cgroSuseName;
+
     @ApiModelProperty(value = "",notes = "群号码Uuid/t",example = "")
     @NotNull(message = "请指定群号码")
     @JSONField(serializeUsing = ToStringSerializer.class)
-    private Long cgusCgroUuid;
+    private Long cgroUuid;
 
     @ApiModelProperty(value = "",notes = "群chatUuid/t",example = "")
     @NotNull(message = "请指定群chatUuid")
     @JSONField(serializeUsing = ToStringSerializer.class)
-    private Long groupChatUuid;
+    private Long cgroChatUuid;
 
-    public Long getGroupChatUuid() {
-        return groupChatUuid;
+    public Long getCgroChatUuid() {
+        return cgroChatUuid;
     }
 
-    public void setGroupChatUuid(Long groupChatUuid) {
-        this.groupChatUuid = groupChatUuid;
+    public void setCgroChatUuid(Long cgroChatUuid) {
+        this.cgroChatUuid = cgroChatUuid;
     }
 
     public Long getCgusSuseUuid() {
@@ -58,11 +61,19 @@ public class OutGroupVo {
         this.cgusSuseUuid = cgusSuseUuid;
     }
 
-    public Long getCgusCgroUuid() {
-        return cgusCgroUuid;
+    public Long getCgroUuid() {
+        return cgroUuid;
     }
 
-    public void setCgusCgroUuid(Long cgusCgroUuid) {
-        this.cgusCgroUuid = cgusCgroUuid;
+    public void setCgroUuid(Long cgroUuid) {
+        this.cgroUuid = cgroUuid;
+    }
+
+    public String getCgroSuseName() {
+        return cgroSuseName;
+    }
+
+    public void setCgroSuseName(String cgroSuseName) {
+        this.cgroSuseName = cgroSuseName;
     }
 }

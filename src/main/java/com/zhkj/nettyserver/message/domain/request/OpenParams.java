@@ -126,4 +126,5 @@ public class OpenParams {
     public void seteSuseUuid(Long eSuseUuid) {
         this.eSuseUuid = eSuseUuid;
     }
+
 }

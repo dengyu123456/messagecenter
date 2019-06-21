@@ -8,7 +8,7 @@
     <id column="id" jdbcType="BIGINT" property="id" />
     <result column="cgus_uuid" jdbcType="BIGINT" property="cgusUuid" />
     <result column="cgus_suse_uuid" jdbcType="BIGINT" property="cgusSuseUuid" />
-    <result column="cgus_cgro_uuid" jdbcType="BIGINT" property="cgusCgroUuid" />
+    <result column="cgus_cgro_uuid" jdbcType="BIGINT" property="cgroUuid" />
     <result column="cgus_order" jdbcType="INTEGER" property="cgusOrder" />
     <result column="cgus_name" jdbcType="VARCHAR" property="cgusName" />
     <result column="cgus_data_stutus" jdbcType="BIT" property="cgusDataStutus" />

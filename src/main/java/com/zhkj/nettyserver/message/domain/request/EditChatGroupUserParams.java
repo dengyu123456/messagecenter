@@ -14,10 +14,7 @@ public class EditChatGroupUserParams {
     @NotNull(message = "请指定群成员Uuid")
     private Long cgusUuid;
 
-//    @ApiModelProperty(value = "",notes = "群参与用户Uuid",example = "")
-//    private Long cgusSuseUuid;
-//
-//
+
     @ApiModelProperty(value = "",notes = "群Uuid",example = "")
     @NotNull(message = "请指定群的Uuid")
     private Long cgusCgroUuid;

@@ -282,7 +282,7 @@
 ////         */
 ////        OutGroupParams params = reqOb;
 ////        Long chatGroupChatUuid = null;
-////        List<ChatGroupUser> chatGroupUserList = this.messageService.selectChatGroupUser(params.getCgusCgroUuid());
+////        List<ChatGroupUser> chatGroupUserList = this.messageService.selectChatGroupUser(params.getCgroUuid());
 ////        try {
 ////            User user = this.messageService.selectUserByUserUuid(params.getCgusSuseUuid());
 ////            chatGroupChatUuid = this.messageService.outGroup(params);
@@ -292,7 +292,7 @@
 ////        }
 ////        OutGroupVo vo = new OutGroupVo();
 ////        BeanUtil.copyProperties(params,vo);
-////        vo.setGroupChatUuid(chatGroupChatUuid);
+////        vo.setCgroChatUuid(chatGroupChatUuid);
 ////        for (ChatGroupUser chatGroupUser : chatGroupUserList) {
 ////            this.send(chatGroupUser.getCgusSuseUuid(), ResponseStompFactory.createOk(params, "outGroup"));
 ////        }
@@ -320,7 +320,7 @@
 ////            LOGGER.error(e.getMessage());
 ////            this.send(principal.getName(), ResponseStompFactory.createOk("新增失败", "addGroup"));
 ////        } finally {
-////            ChatGroup cGroup = this.messageService.selectChatGroupByCgroUuid(params.getCgusCgroUuid());
+////            ChatGroup cGroup = this.messageService.selectChatGroupByCgroUuid(params.getCgroUuid());
 ////            List<ChatGroupVO> voList = new ArrayList<ChatGroupVO>();
 ////            if (cGroup != null) {
 ////                User user = null;
@@ -402,7 +402,7 @@
 ////    @MessageMapping(value = "/edit/group/user")
 ////    public void editGroupUser(EditChatGroupUserParams reqOb, Principal principal) {
 ////        EditChatGroupUserParams params = reqOb;
-////        List<ChatGroupUser> chatGroupUserList = this.messageService.selectChatGroupUser(params.getCgusCgroUuid());
+////        List<ChatGroupUser> chatGroupUserList = this.messageService.selectChatGroupUser(params.getCgroUuid());
 ////        if (this.messageService.updateChatGroupUserByCgusUuid(params) < 1) {
 ////            this.send(principal.getName(), ResponseStompFactory.createBad("修改群名片失败", "editGroupUser"));
 ////        } else {

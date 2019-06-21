@@ -53,7 +53,7 @@ public class AddGroupHandler extends SimpleChannelInboundHandler<AddChatGroupUse
 //            sendWebSocket(channel, ResponseStompFactory.createBad("请指定被拉人Uuid", "addGroup"));
 //            return;
 //        }
-//        if (agup.getCgusCgroUuid() == null) {
+//        if (agup.getCgroUuid() == null) {
 //            sendWebSocket(channel, ResponseStompFactory.createBad("请指定群Uuid", "addGroup"));
 //            return;
 //        }
@@ -63,7 +63,7 @@ public class AddGroupHandler extends SimpleChannelInboundHandler<AddChatGroupUse
 //            //   LOGGER.error(e.getMessage());
 //            sendWebSocket(channel, ResponseStompFactory.createOk("新增失败", "addGroup"));
 //        } finally {
-//            ChatGroup cGroup = this.messageService.selectChatGroupByCgroUuid(agup.getCgusCgroUuid());
+//            ChatGroup cGroup = this.messageService.selectChatGroupByCgroUuid(agup.getCgroUuid());
 //            if (cGroup != null) {
 //                User user = null;
 //                ChatGroup chat = cGroup;

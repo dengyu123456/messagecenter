@@ -69,6 +69,51 @@ public class MessageServiceImpl implements MessageService {
         return this.chatMapper.selectOne(tmp);
     }
 
+    //创建群会话 在创建群的时候使用
+    private int insertGroupChat(OpenParams params, Long chatUuid) {
+        int count = 0;
+        List<ChatGroupUser> cgusList = new ArrayList<ChatGroupUser>();
+        Chat chat = new Chat();
+        chat.setChatUuid(chatUuid);
+        chat.setChatName(params.getChatName());
+        chat.setChatCsuseUuid(params.getsSuseUuid());
+        chat.setChatPublic(1);
+        chat.setChatType(params.getChatType());
+        if (chat.getChatType() == 2) {
+            cgusList = this.selectChatGroupUser(params.getCgroUuid());
+            if (CollectionUtils.isEmpty(cgusList)) {
+                throw new RuntimeException("创建会话失败，群成员为空");
+            }
+            chat.setChatCount(cgusList.size());
+        }
+        Date currTime = new Date(System.currentTimeMillis());
+        chat.setChatLastTime(currTime);
+        chat.setCreateTime(currTime);
+        int index = 0;
+        User user = this.selectBySuseUuid(params.getsSuseUuid(), false);
+        for (ChatGroupUser item : cgusList) {
+            ChatUser chatUser = new ChatUser();
+            chatUser.setCuseUuid(UuidUtil.gen());
+            chatUser.setCuseSuseUuid(item.getCgusSuseUuid());
+            chatUser.setCuseChatUuid(chatUuid);
+            chatUser.setCuseOrder(index);
+            chatUser.setCuseChatStatus(0);
+            chatUser.setCuseDataStutus(0);
+            chatUser.setCuseLine(1);
+            user = this.selectBySuseUuid(item.getCgusSuseUuid(), false);
+            if (user == null) {
+                throw new RuntimeException("客户不存在");
+            }
+            chatUser.setCuseName(user.getUserName());
+            chatUser.setCreateTime(currTime);
+            index++;
+            this.chatUserMapper.insert(chatUser);
+            count++;
+        }
+        count += this.chatMapper.insert(chat);
+        return count;
+    }
+
     /**
      * 创建会话
      *
@@ -257,7 +302,7 @@ public class MessageServiceImpl implements MessageService {
      * @return
      */
     @Override
-    public List<User> selectUserByEnteUuid(Long userEnteUuid, boolean isAll,Long suseUuid) {
+    public List<User> selectUserByEnteUuid(Long userEnteUuid, boolean isAll, Long suseUuid) {
         User params = new User();
         params.setUserEnteUuid(userEnteUuid);
         params.setUserType(0);
@@ -326,16 +371,20 @@ public class MessageServiceImpl implements MessageService {
 
     /**
      * 创建群
+     * <p>
+     * 同时创建会话
      *
      * @param params2
      * @return
      */
-    @Transactional
     @Override
     public ChatGroup insertGroup(OpenGroupParams2 params2) {
+        Long cgroUuid = UuidUtil.gen();
+        Long chatUuid = UuidUtil.gen();
+        int count = 0;
         ChatGroup group = new ChatGroup();
-        group.setCgroUuid(UuidUtil.gen());
-//        group.setCgroChatUuid();
+        group.setCgroUuid(cgroUuid);
+        group.setCgroChatUuid(chatUuid);
         group.setCgroName(params2.getCgorName());
         group.setCgroCsuseUuid(params2.getsSuseUuid());
         group.setCgroPublic(0);
@@ -344,7 +393,11 @@ public class MessageServiceImpl implements MessageService {
         group.setCgroDataStatus(0);
         Date currTime = new Date(System.currentTimeMillis());
         group.setCreateTime(currTime);
-        int count = this.insertChatGroup(group);
+
+        count += this.insertChatGroup(group);
+
+
+
         int index = 0;
         ChatGroupUser user0 = new ChatGroupUser();
         user0.setCgusUuid(UuidUtil.gen());
@@ -380,7 +433,15 @@ public class MessageServiceImpl implements MessageService {
             index++;
         }
 
-        if (count < 3) {
+        //创建会话
+        OpenParams chat = new OpenParams();
+        chat.setChatType(2);
+        chat.setChatName(params2.getCgorName());
+        chat.setCgroUuid(cgroUuid);
+        chat.setsSuseUuid(params2.getsSuseUuid());
+        count+=this.insertGroupChat(chat, chatUuid);
+
+        if (count < 4) {
             throw new RuntimeException("创建群失败");
         }
         return group;
@@ -468,6 +529,7 @@ public class MessageServiceImpl implements MessageService {
      * @param params
      * @return
      */
+    @Transactional
     @Override
     public Long outGroup(OutGroupParams params) throws RuntimeException {
         int count = 0;
@@ -500,16 +562,16 @@ public class MessageServiceImpl implements MessageService {
 //        更新会话人数（减一）
         count += this.chatMapper.updateSubCountByChatUuid(chatGroup.getCgroChatUuid());
 //        更新chat_user表的用户状态为删除
-        if(chatGroup.getCgroChatUuid() == null){
+        if (chatGroup.getCgroChatUuid() == null) {
 //            删除群用户
             this.chatUserMapper.deleteByExample(Example.builder(ChatUser.class).andWhere(Sqls.custom().
-                    andEqualTo("cuseSuseUuid", params.getCgusSuseUuid()).andEqualTo("cuseChatUuid",chatGroup.getCgroChatUuid())).build());
-        }else {//更新会话用户
+                    andEqualTo("cuseSuseUuid", params.getCgusSuseUuid()).andEqualTo("cuseChatUuid", chatGroup.getCgroChatUuid())).build());
+        } else {//更新会话用户
             ChatUser chatUser = new ChatUser();
             chatUser.setCuseDataStutus(1);
             chatUser.setCuseChatStatus(1);
             count += this.chatUserMapper.updateByExampleSelective(chatUser, Example.builder(ChatUser.class).andWhere(Sqls.custom().
-                    andEqualTo("cuseSuseUuid", params.getCgusSuseUuid()).andEqualTo("cuseChatUuid",chatGroup.getCgroChatUuid())).build());
+                    andEqualTo("cuseSuseUuid", params.getCgusSuseUuid()).andEqualTo("cuseChatUuid", chatGroup.getCgroChatUuid())).build());
         }
 //        更新chat表的会话人数减一
         if (chatGroup == null) {
@@ -589,7 +651,7 @@ public class MessageServiceImpl implements MessageService {
             chatGroupUser.setCgusName(user1.getUserName());
 //         添加顺序
             chatGroupUser.setCgusOrder(this.chatGroupUserMapper.selectCountByExample(Example.builder(ChatGroupUser.class).
-                    andWhere(Sqls.custom().andEqualTo("cgusCgroUuid",params.getCgusCgroUuid())).build())+1);
+                    andWhere(Sqls.custom().andEqualTo("cgusCgroUuid", params.getCgusCgroUuid())).build()) + 1);
 //        群uuid
             chatGroupUser.setCgusCgroUuid(params.getCgusCgroUuid());
 //        创建时间
@@ -637,7 +699,7 @@ public class MessageServiceImpl implements MessageService {
         int[] sumCount = new int[params.getCgusUuid().length];
         for (int i = 0; i < params.getCgusUuid().length; i++) {
             int count = this.chatGroupUserMapper.deleteByExample(Example.builder(ChatGroupUser.class).
-                    andWhere(Sqls.custom().andEqualTo("cgusSuseUuid", params.getCgusUuid()[i]).andEqualTo("cgusCgroUuid",params.getCgroUuid())).build());
+                    andWhere(Sqls.custom().andEqualTo("cgusSuseUuid", params.getCgusUuid()[i]).andEqualTo("cgusCgroUuid", params.getCgroUuid())).build());
             sumCount[i] = count;
 //            更新最近会话
             ChatGroup chatGroup = this.chatGroupMapper.selectOneByCgroUuid(params.getCgroUuid());
@@ -645,12 +707,13 @@ public class MessageServiceImpl implements MessageService {
             chatUser.setCuseDataStutus(1);
             chatUser.setCuseDataStutus(1);
             int count1 = this.chatUserMapper.updateByExampleSelective(chatUser, Example.builder(ChatUser.class).
-                    andWhere(Sqls.custom().andEqualTo("cuseSuseUuid", params.getCgusUuid()[i]).andEqualTo("cuseChatUuid",chatGroup.getCgroChatUuid())).build());
+                    andWhere(Sqls.custom().andEqualTo("cuseSuseUuid", params.getCgusUuid()[i]).andEqualTo("cuseChatUuid", chatGroup.getCgroChatUuid())).build());
         }
 //        更新群成员数
-        int countUpdate = this.chatGroupMapper.updateChatGroupCountByChatGroupUuid(params.getCgroUuid(),params.getCgusUuid().length);
+        int countUpdate = this.chatGroupMapper.updateChatGroupCountByChatGroupUuid(params.getCgroUuid(), params.getCgusUuid().length);
         return sumCount;
     }
+
     /**
      * 修改群名片
      *

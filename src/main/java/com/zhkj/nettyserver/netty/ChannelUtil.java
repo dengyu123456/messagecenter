@@ -83,7 +83,7 @@ public class ChannelUtil {
         return this.echaMap.get(enteUuid).get(suseUuid);
     }
 
-    //获取管道组
+    //获取所有管道
     public ChannelGroup getChannelGroup(ChannelHandlerContext ctx) {
         ChannelGroup channelGroup = new DefaultChannelGroup(ctx.executor());
         for (ConcurrentHashMap<Long, Channel> chalMap : echaMap.values()) {

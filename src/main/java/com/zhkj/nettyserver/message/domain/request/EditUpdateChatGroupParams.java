@@ -6,11 +6,12 @@ import javax.validation.constraints.NotNull;
 
 /**
  * Des:编辑群成员
- * ClassName: EditUpdateChatGroup
+ * ClassName: EditUpdateChatGroupParams
  * Author: dengyi
  * Date: 2019-06-20 09:27
  */
-public class EditUpdateChatGroup {
+//编辑群成员
+public class EditUpdateChatGroupParams {
     @ApiModelProperty(value = "",notes = "群参与用户Uuid/t",example = "")
     @NotNull
     private Long cgusSuseUuid;

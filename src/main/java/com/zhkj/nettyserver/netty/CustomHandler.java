@@ -105,8 +105,7 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
                     sendHttpResponse(ctx, request, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FORBIDDEN));
                 } else {//没有问题
                     User user = messageService.selectUserByUserUuid(Long.valueOf(vo.getUuid()));
-
-                    ChannelUtil.getInstance().bindChannel(user.getUserEnteUuid(), Long.valueOf(vo.getUuid()), ctx.channel());
+                    ChannelUtil.getInstance().bindChannel(user == null ? null : user.getUserEnteUuid(), Long.valueOf(vo.getUuid()), ctx.channel());
                     handshaker.handshake(ctx.channel(), request);
                 }
             }
@@ -152,7 +151,7 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
     private void handleWebSocketFrame(ChannelHandlerContext ctx, WebSocketFrame frame) throws Exception {
         //当前管道用户uuid
         Long useUuid = ChannelUtil.getInstance().getSuseUuid(ctx.channel());
-        // System.out.println(useUuid);
+        System.out.println(useUuid);
         if (frame instanceof CloseWebSocketFrame) {//关闭管道
             ChannelUtil.getInstance().unBindChannel(ctx.channel(), useUuid);
             handshaker.close(ctx.channel(), (CloseWebSocketFrame) frame.retain());
@@ -330,9 +329,11 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
         this.messageService.updateChatGroup(ecgp, ChannelUtil.getInstance().getSuseUuid(channel).toString());
         List<ChatGroupUser> chatGroupUserList = this.messageService.selectChatGroupUser(ecgp.getCgroUuid());
         ChatGroup chatGroup = this.messageService.selectChatGroupByCgroUuid(ecgp.getCgroUuid());
-        ChatGroup chat = chatGroup;
+        User user = this.messageService.selectUserByUserUuid(chatGroup.getCgroCsuseUuid());
         ChatGroupVO vo = new ChatGroupVO();
-        BeanUtil.copyProperties(chat, vo);
+        BeanUtil.copyProperties(chatGroup, vo);
+        vo.setCgroCsuseName(user.getUserName());
+        vo.setOldCgroName(chatGroup.getCgroName());
         vo.setChatGroupUserList(chatGroupUserList);
         for (ChatGroupUser chatGroupUser : chatGroupUserList) {
             sendWebSocket(ChannelUtil.getInstance().getChannel(channel, chatGroupUser.getCgusSuseUuid()), ResponseStompFactory.createOk(vo, "editGroup"));
@@ -390,7 +391,7 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
             sendWebSocket(channel, ResponseStompFactory.createBad("请指定编辑群信息", "updateGroup"));
             return;
         }
-        EditUpdateChatGroup eucg = JSON.parseObject(params, EditUpdateChatGroup.class);
+        EditUpdateChatGroupParams eucg = JSON.parseObject(params, EditUpdateChatGroupParams.class);
         List<ChatGroupUser> chatGroupUserList = this.messageService.selectChatGroupUser(eucg.getCgusCgroUuid());
         if (CollectionUtil.isEmpty(chatGroupUserList)) {
             sendWebSocket(channel, ResponseStompFactory.createBad("不存在当前群", "updateGroup"));
@@ -494,17 +495,19 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
         Long chatGroupChatUuid = null;
         List<ChatGroupUser> chatGroupUserList = this.messageService.selectChatGroupUser(ogpa.getCgusCgroUuid());
         try {
-            User user = this.messageService.selectUserByUserUuid(ogpa.getCgusSuseUuid());
+//          User user = this.messageService.selectUserByUserUuid(ogpa.getCgusSuseUuid());
             chatGroupChatUuid = this.messageService.outGroup(ogpa);
         } catch (Exception e) {
             //  LOGGER.info(e.getMessage());
             sendWebSocket(channel, ResponseStompFactory.createOk("退群失败", "outGroup"));
         }
+        User user = this.messageService.selectUserByUserUuid(ogpa.getCgusSuseUuid());
         OutGroupVo vo = new OutGroupVo();
-        BeanUtil.copyProperties(params, vo);
-        vo.setGroupChatUuid(chatGroupChatUuid);
+        vo.setCgroChatUuid(chatGroupChatUuid);
+        vo.setCgroUuid(ogpa.getCgusCgroUuid());
+        vo.setCgroSuseName(user.getUserName());
         for (ChatGroupUser item : chatGroupUserList) {
-            sendWebSocket(ChannelUtil.getInstance().getChannel(channel, item.getCgusSuseUuid()), ResponseStompFactory.createOk(params, "outGroup"));
+            sendWebSocket(ChannelUtil.getInstance().getChannel(channel, item.getCgusSuseUuid()), ResponseStompFactory.createOk(vo, "outGroup"));
         }
     }
 
@@ -554,6 +557,8 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
         }
 
         ChatGroup chatGroup = this.messageService.insertGroup(ogp2);
+        //创建会话
+
         List<Long> userList = ogp2.geteSuseUuid();
         OpenGroupVO vo = new OpenGroupVO();
         BeanUtil.copyProperties(chatGroup, vo);

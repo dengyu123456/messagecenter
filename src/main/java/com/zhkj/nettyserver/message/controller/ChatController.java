@@ -273,7 +273,7 @@ public class ChatController {
         }
         OutGroupVo vo = new OutGroupVo();
         BeanUtil.copyProperties(params,vo);
-        vo.setGroupChatUuid(chatGroupChatUuid);
+        vo.setCgroChatUuid(chatGroupChatUuid);
         return vo;
     }
 

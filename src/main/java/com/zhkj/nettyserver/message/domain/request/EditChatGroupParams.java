@@ -21,6 +21,17 @@ public class EditChatGroupParams {
     @ApiModelProperty(value = "",notes = "数据是否正常0：正常1：删除",example = "")
     private Integer cgroDataStatus;
 
+    //修改之前的名字
+    private String oldCgroName;
+
+    public String getOldCgroName() {
+        return oldCgroName;
+    }
+
+    public void setOldCgroName(String oldCgroName) {
+        this.oldCgroName = oldCgroName;
+    }
+
     public Long getCgroUuid() {
         return cgroUuid;
     }
