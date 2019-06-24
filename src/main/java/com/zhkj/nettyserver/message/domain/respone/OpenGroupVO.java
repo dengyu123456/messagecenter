@@ -46,6 +46,8 @@ public class OpenGroupVO {
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgroCsuseUuid;
 
+    //群创建者名字
+    private String cgroCsuseName;
     /**
      * 群是否公开 0：公开 1：不公开
      */
@@ -122,5 +124,13 @@ public class OpenGroupVO {
 
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
+    }
+
+    public String getCgroCsuseName() {
+        return cgroCsuseName;
+    }
+
+    public void setCgroCsuseName(String cgroCsuseName) {
+        this.cgroCsuseName = cgroCsuseName;
     }
 }

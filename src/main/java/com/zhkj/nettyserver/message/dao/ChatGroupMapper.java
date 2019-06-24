@@ -11,7 +11,7 @@ import java.util.List;
 public interface ChatGroupMapper extends Mapper<ChatGroup> {
     List<ChatGroup> selectChatGroupBySuseUuid(@Param("suseUuid") Long suseUuid);
 
-    int updateSubCountByCgroUuid(@Param("cgroCount") Long cgusCgroUuid);
+    int updateSubCountByCgroUuid(@Param("cgusCgroUuid") Long cgusCgroUuid);
 
     int updateAddCountByCgroUuid(@Param("cgusCgroUuid") Long cgusCgroUuid);
 

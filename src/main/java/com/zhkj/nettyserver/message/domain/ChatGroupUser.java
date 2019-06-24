@@ -1,5 +1,8 @@
 package com.zhkj.nettyserver.message.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
+
 import javax.persistence.*;
 import java.util.Date;
 
@@ -12,18 +15,21 @@ public class ChatGroupUser {
     /**
      * 群成员Uuid
      */
+    @JSONField(serializeUsing = ToStringSerializer.class)
     @Column(name = "cgus_uuid")
     private Long cgusUuid;
 
     /**
      * 群参与用户Uuid
      */
+    @JSONField(serializeUsing = ToStringSerializer.class)
     @Column(name = "cgus_suse_uuid")
     private Long cgusSuseUuid;
 
     /**
      * 群Uuid
      */
+    @JSONField(serializeUsing = ToStringSerializer.class)
     @Column(name = "cgus_cgro_uuid")
     private Long cgusCgroUuid;
 

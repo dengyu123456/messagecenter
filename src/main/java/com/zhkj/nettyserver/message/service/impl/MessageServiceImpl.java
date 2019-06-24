@@ -20,6 +20,7 @@ import tk.mybatis.mapper.entity.Example;
 import tk.mybatis.mapper.util.Sqls;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -397,7 +398,6 @@ public class MessageServiceImpl implements MessageService {
         count += this.insertChatGroup(group);
 
 
-
         int index = 0;
         ChatGroupUser user0 = new ChatGroupUser();
         user0.setCgusUuid(UuidUtil.gen());
@@ -439,7 +439,7 @@ public class MessageServiceImpl implements MessageService {
         chat.setChatName(params2.getCgorName());
         chat.setCgroUuid(cgroUuid);
         chat.setsSuseUuid(params2.getsSuseUuid());
-        count+=this.insertGroupChat(chat, chatUuid);
+        count += this.insertGroupChat(chat, chatUuid);
 
         if (count < 4) {
             throw new RuntimeException("创建群失败");
@@ -540,6 +540,7 @@ public class MessageServiceImpl implements MessageService {
         if (selectChatGroupUser == null) {
             throw new RuntimeException("不存在该用户");
         }
+
         ChatGroupUser chatGroupUser = new ChatGroupUser();
         chatGroupUser.setCgusDataStutus(1);
 //        更新退群人状态
@@ -548,10 +549,26 @@ public class MessageServiceImpl implements MessageService {
         //人退出群的时候减一 （人数大于0的时候执行此操作）
         count += this.chatGroupMapper.updateSubCountByCgroUuid(params.getCgusCgroUuid());
 
-        //如果群人数为0
         ChatGroup chatGroup = this.chatGroupMapper.selectOneByExample(Example.builder(ChatGroup.class).andWhere(Sqls
                 .custom().andEqualTo("cgroUuid", selectChatGroupUser.getCgusCgroUuid())).build());
-        if (chatGroup.getCgroCount().equals(0)) {
+//        if (chatGroup.getCgroCsuseUuid()==param.getCgusSuseUuid()){
+//            if (params.getNewGroupOwnerUuid()==null){
+//                //如果是群主退群，默认按照加群顺序 修改群主
+//                ChatGroupUser newGroupOwner = this.selectMinGroupUser(param.getCgusCgroUuid());
+//                //设置为新群主
+//                ChatGroup uCgroP=new ChatGroup();
+//                uCgroP.setCgroCsuseUuid(newGroupOwner.getCgusSuseUuid());
+//                count += this.chatGroupMapper.updateByExampleSelective(uCgroP, Example.builder(ChatGroup.class).andWhere(Sqls.custom().
+//                        andEqualTo("EditChatGroup", selectChatGroupUser.getCgusCgroUuid())).build());
+//            }else {
+//                ChatGroup uCgroP=new ChatGroup();
+//                uCgroP.setCgroCsuseUuid(params.getNewGroupOwnerUuid());
+//                count += this.chatGroupMapper.updateByExampleSelective(uCgroP, Example.builder(ChatGroup.class).andWhere(Sqls.custom().
+//                        andEqualTo("EditChatGroup", selectChatGroupUser.getCgusCgroUuid())).build());
+//            }
+//
+//        }
+        if (chatGroup.getCgroCount().equals(0) || chatGroup.getCgroCsuseUuid() == param.getCgusSuseUuid()) {
 //            更新群状态为删除状态
             ChatGroup chatGroup1 = new ChatGroup();
             chatGroup1.setCgroDataStatus(1);
@@ -559,11 +576,12 @@ public class MessageServiceImpl implements MessageService {
                     andEqualTo("cgroUuid", selectChatGroupUser.getCgusCgroUuid())).build());
             throw new RuntimeException("该群已解散");
         }
-//        更新会话人数（减一）
+
+        //        更新会话人数（减一）
         count += this.chatMapper.updateSubCountByChatUuid(chatGroup.getCgroChatUuid());
-//        更新chat_user表的用户状态为删除
+        //        更新chat_user表的用户状态为删除
         if (chatGroup.getCgroChatUuid() == null) {
-//            删除群用户
+            //            删除群用户
             this.chatUserMapper.deleteByExample(Example.builder(ChatUser.class).andWhere(Sqls.custom().
                     andEqualTo("cuseSuseUuid", params.getCgusSuseUuid()).andEqualTo("cuseChatUuid", chatGroup.getCgroChatUuid())).build());
         } else {//更新会话用户
@@ -594,7 +612,7 @@ public class MessageServiceImpl implements MessageService {
      */
     @Override
     @Transactional
-    public int cgroUuid(EditChatGroupParams editChatGroupParams) {
+    public int EditChatGroup(EditChatGroupParams editChatGroupParams) {
 //       判断是否是群主
         int count = 0;
         ChatGroup chatGroup = new ChatGroup();
@@ -603,7 +621,7 @@ public class MessageServiceImpl implements MessageService {
             throw new RuntimeException("不是该群群主");
         } else {
             this.chatGroupMapper.updateByExampleSelective(chatGroup, Example.builder(ChatGroup.class).andWhere(Sqls.custom().
-                    andEqualTo("cgroUuid", editChatGroupParams.getCgroUuid())).build());
+                    andEqualTo("EditChatGroup", editChatGroupParams.getCgroUuid())).build());
             count = 1;
         }
         return count;
@@ -679,7 +697,7 @@ public class MessageServiceImpl implements MessageService {
      */
     @Override
     public void updateChatGroup(ChatGroup chatGroup) {
-        this.chatGroupMapper.updateByExampleSelective(chatGroup, Example.builder(ChatGroup.class).andWhere(Sqls.custom().andEqualTo("cgroUuid", chatGroup.getCgroUuid())).build());
+        this.chatGroupMapper.updateByExampleSelective(chatGroup, Example.builder(ChatGroup.class).andWhere(Sqls.custom().andEqualTo("EditChatGroup", chatGroup.getCgroUuid())).build());
     }
 
     /**
@@ -694,23 +712,30 @@ public class MessageServiceImpl implements MessageService {
 //                andWhere(Sqls.custom().andEqualTo("cgusUuid",cgusUuid)).build());
 //        return count;
 //    }
+    @Transactional
     @Override
     public int[] deleteChatGroupUserByCgusUuid(DelChatGroupUserParams params) {
         int[] sumCount = new int[params.getCgusUuid().length];
+        ChatGroup chatGroup = null;
         for (int i = 0; i < params.getCgusUuid().length; i++) {
             int count = this.chatGroupUserMapper.deleteByExample(Example.builder(ChatGroupUser.class).
                     andWhere(Sqls.custom().andEqualTo("cgusSuseUuid", params.getCgusUuid()[i]).andEqualTo("cgusCgroUuid", params.getCgroUuid())).build());
             sumCount[i] = count;
 //            更新最近会话
-            ChatGroup chatGroup = this.chatGroupMapper.selectOneByCgroUuid(params.getCgroUuid());
+            chatGroup = this.chatGroupMapper.selectOneByCgroUuid(params.getCgroUuid());
+
             ChatUser chatUser = new ChatUser();
             chatUser.setCuseDataStutus(1);
             chatUser.setCuseDataStutus(1);
             int count1 = this.chatUserMapper.updateByExampleSelective(chatUser, Example.builder(ChatUser.class).
                     andWhere(Sqls.custom().andEqualTo("cuseSuseUuid", params.getCgusUuid()[i]).andEqualTo("cuseChatUuid", chatGroup.getCgroChatUuid())).build());
+
         }
-//        更新群成员数
+
+        //更新群成员数
         int countUpdate = this.chatGroupMapper.updateChatGroupCountByChatGroupUuid(params.getCgroUuid(), params.getCgusUuid().length);
+        //更新会话人数
+        this.chatMapper.updateChatCount(chatGroup.getCgroChatUuid(), params.getCgusUuid().length);
         return sumCount;
     }
 
@@ -732,18 +757,26 @@ public class MessageServiceImpl implements MessageService {
     /**
      * 修改群信息
      *
-     * @param editChatGroupParams
+     * @param params
      * @param uuid
      * @return
      */
+    @Transactional
     @Override
-    public int updateChatGroup(EditChatGroupParams editChatGroupParams, String uuid) {
+    public int updateChatGroup(EditChatGroupParams params, String uuid) {
+        int count = 0;
         ChatGroup chatGroup = new ChatGroup();
-        chatGroup.setCgroName(editChatGroupParams.getCgroName());
-        chatGroup.setCgroDataStatus(editChatGroupParams.getCgroDataStatus());
-        chatGroup.setCgroPublic(editChatGroupParams.getCgroPublic());
-        int count = this.chatGroupMapper.updateByExampleSelective(chatGroup, Example.builder(ChatGroup.class).
-                andWhere(Sqls.custom().andEqualTo("cgroUuid", editChatGroupParams.getCgroUuid())).build());
+        chatGroup.setCgroName(params.getCgroName());
+        chatGroup.setCgroDataStatus(params.getCgroDataStatus());
+        chatGroup.setCgroPublic(params.getCgroPublic());
+        //修改会话名字
+        Chat chat = new Chat();
+        ChatGroup rCgro = this.selectChatGroupByCgroUuid(params.getCgroUuid());
+        chat.setChatUuid(rCgro.getCgroChatUuid());
+        chat.setChatName(params.getCgroName());
+        count += this.chatMapper.updateByExampleSelective(chat, Example.builder(Chat.class).andWhere(Sqls.custom().andEqualTo("chatUuid", chat.getChatUuid())).build());
+        count += this.chatGroupMapper.updateByExampleSelective(chatGroup, Example.builder(ChatGroup.class).
+                andWhere(Sqls.custom().andEqualTo("cgroUuid", params.getCgroUuid())).build());
         return count;
     }
 
@@ -759,4 +792,26 @@ public class MessageServiceImpl implements MessageService {
 //        手写mysql 语句
         return this.userMapper.selectUserByUserUuid(sSuseUuid);
     }
+
+    /**
+     * 查询原成员
+     *
+     * @param cgroUuid
+     * @param userArr
+     * @return
+     */
+    @Override
+    public List<Long> selectOldGroupUser(Long cgroUuid, Long[] userArr) {
+
+        return this.chatGroupUserMapper.selectOldGroupUser(cgroUuid, Arrays.asList(userArr));
+    }
+
+    /**
+     * 查询加群顺序cgus_order最小的
+     */
+    private ChatGroupUser selectMinGroupUser(Long cgroUuid) {
+        return this.chatGroupUserMapper.selectMinGroupUser(cgroUuid);
+    }
+
+
 }

@@ -207,7 +207,7 @@ public interface MessageService {
      * @param editChatGroupParams
      * @return
      */
-    int cgroUuid(EditChatGroupParams editChatGroupParams);
+    int EditChatGroup(EditChatGroupParams editChatGroupParams);
 
     /**
      * 增加群成员
@@ -255,4 +255,13 @@ public interface MessageService {
      * @return
      */
     User selectUserByUserUuid(Long sSuseUuid);
+
+    /**
+     * 查询原成员
+     * @param cgroUuid
+     * @param userArr
+     * @return
+     */
+   List<Long> selectOldGroupUser(Long cgroUuid,Long []userArr);
+
 }

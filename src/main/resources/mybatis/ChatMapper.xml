@@ -49,4 +49,7 @@
     <update id="updateChatCountByChatUuid">
       UPDATE chat_group SET cgro_count = cgro_count-1 WHERE cgro_uuid = #{chatUuid}
     </update>
+    <update id="updateChatCount">
+        UPDATE chat SET chat_count=chat_count-#{length} WHERE chat_uuid=#{chatUuid} AND chat_count >0
+    </update>
 </mapper>

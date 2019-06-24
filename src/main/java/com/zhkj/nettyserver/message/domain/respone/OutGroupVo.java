@@ -28,7 +28,6 @@ import javax.validation.constraints.NotNull;
 public class OutGroupVo {
 
     @ApiModelProperty(value = "",notes = "退出群的用户Uuid/t",example = "")
-    @NotNull(message = "请指定退出群的用户")
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgusSuseUuid;
 
@@ -36,12 +35,13 @@ public class OutGroupVo {
     private String cgroSuseName;
 
     @ApiModelProperty(value = "",notes = "群号码Uuid/t",example = "")
-    @NotNull(message = "请指定群号码")
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgroUuid;
 
+    //群名字
+    private String cgroName;
+
     @ApiModelProperty(value = "",notes = "群chatUuid/t",example = "")
-    @NotNull(message = "请指定群chatUuid")
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgroChatUuid;
 
@@ -71,6 +71,14 @@ public class OutGroupVo {
 
     public String getCgroSuseName() {
         return cgroSuseName;
+    }
+
+    public String getCgroName() {
+        return cgroName;
+    }
+
+    public void setCgroName(String cgroName) {
+        this.cgroName = cgroName;
     }
 
     public void setCgroSuseName(String cgroSuseName) {

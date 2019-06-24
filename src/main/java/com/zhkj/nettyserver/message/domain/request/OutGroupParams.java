@@ -32,6 +32,17 @@ public class OutGroupParams {
     @NotNull(message = "请指定群号码")
     private Long cgusCgroUuid;
 
+    //新群主 如果是群主退群，指定一个新的群主 不指定默认按照加群顺序指定群主
+    private Long newGroupOwnerUuid;
+
+    public Long getNewGroupOwnerUuid() {
+        return newGroupOwnerUuid;
+    }
+
+    public void setNewGroupOwnerUuid(Long newGroupOwnerUuid) {
+        this.newGroupOwnerUuid = newGroupOwnerUuid;
+    }
+
     public Long getCgusSuseUuid() {
         return cgusSuseUuid;
     }

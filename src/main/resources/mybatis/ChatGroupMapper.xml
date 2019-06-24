@@ -22,10 +22,10 @@
     WHERE cgus.cgus_suse_uuid=#{suseUuid} AND cgus.cgus_data_stutus=0) AND  cgro.cgro_data_status=0
     </select>
     <update id="updateSubCountByCgroUuid">
-    UPDATE chat_group SET cgro_count = cgro_count-1 WHERE cgro_uuid = #{cgroCount} AND cgro_count > 0
+    UPDATE chat_group SET cgro_count = cgro_count-1 WHERE cgro_uuid = #{cgusCgroUuid} AND cgro_count > 0
     </update>
     <update id="updateAddCountByCgroUuid">
-    UPDATE chat_group SET cgro_count = cgro_count+1 WHERE cgro_uuid = #{cgroUuid}
+    UPDATE chat_group SET cgro_count = cgro_count+1 WHERE cgro_uuid = #{cgusCgroUuid}
     </update>
     <update id="updateChatGroupCountByChatGroupUuid">
     UPDATE chat_group SET cgro_count = cgro_count-#{length} WHERE cgro_uuid = #{cgroUuid} and cgro_count > 0

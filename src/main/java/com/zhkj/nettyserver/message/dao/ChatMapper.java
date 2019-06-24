@@ -15,4 +15,6 @@ public interface ChatMapper extends Mapper<Chat> {
     int updateSubCountByChatUuid(Long cgroChatUuid);
 
     void updateChatCountByChatUuid(@Param("chatUuid") Long cgroChatUuid);
+
+    int updateChatCount(@Param("chatUuid") Long chatUuid,@Param("length") int length);
 }

@@ -1,17 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zhkj.nettyserver.message.dao.ChatGroupUserMapper">
-  <resultMap id="BaseResultMap" type="com.zhkj.nettyserver.message.domain.ChatGroupUser">
-    <!--
-      WARNING - @mbg.generated
-    -->
-    <id column="id" jdbcType="BIGINT" property="id" />
-    <result column="cgus_uuid" jdbcType="BIGINT" property="cgusUuid" />
-    <result column="cgus_suse_uuid" jdbcType="BIGINT" property="cgusSuseUuid" />
-    <result column="cgus_cgro_uuid" jdbcType="BIGINT" property="cgroUuid" />
-    <result column="cgus_order" jdbcType="INTEGER" property="cgusOrder" />
-    <result column="cgus_name" jdbcType="VARCHAR" property="cgusName" />
-    <result column="cgus_data_stutus" jdbcType="BIT" property="cgusDataStutus" />
-    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
-  </resultMap>
+    <resultMap id="BaseResultMap" type="com.zhkj.nettyserver.message.domain.ChatGroupUser">
+        <!--
+          WARNING - @mbg.generated
+        -->
+        <id column="id" jdbcType="BIGINT" property="id"/>
+        <result column="cgus_uuid" jdbcType="BIGINT" property="cgusUuid"/>
+        <result column="cgus_suse_uuid" jdbcType="BIGINT" property="cgusSuseUuid"/>
+        <result column="cgus_cgro_uuid" jdbcType="BIGINT" property="cgusCgroUuid"/>
+        <result column="cgus_order" jdbcType="INTEGER" property="cgusOrder"/>
+        <result column="cgus_name" jdbcType="VARCHAR" property="cgusName"/>
+        <result column="cgus_data_stutus" jdbcType="BIT" property="cgusDataStutus"/>
+        <result column="create_time" jdbcType="TIMESTAMP" property="createTime"/>
+    </resultMap>
+    <select id="selectMinGroupUser" parameterType="java.lang.Long"
+            resultType="com.zhkj.nettyserver.message.domain.ChatGroupUser">
+        SELECT * FROM chat_group_user cgus WHERE cgus.cgus_cgro_uuid =#{cgroUuid} AND cgus.cgus_data_stutus=0 ORDER BY cgus.cgus_order LIMIT 1
+    </select>
+    <select id="selectOldGroupUser" resultType="java.lang.Long">
+        SELECT cgus_suse_uuid FROM chat_group_user
+        <where>
+            <if test="cgroUuid != null">
+                cgus_cgro_uuid=#{cgroUuid}
+            </if>
+            <if test="cgusSuseUuid != null and cgusSuseUuid.size() > 0">
+                AND cgus_suse_uuid NOT IN
+                <foreach collection="cgusSuseUuid" item="item" open="(" close=")" separator=",">
+                    #{item}
+                </foreach>
+            </if>
+        </where>
+    </select>
 </mapper>
