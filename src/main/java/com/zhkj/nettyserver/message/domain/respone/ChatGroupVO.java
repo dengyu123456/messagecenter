@@ -15,59 +15,54 @@ public class ChatGroupVO {
     /**
      * 群Uuid
      */
-    @ApiModelProperty(value = "", notes = "群Uuid", example = "")
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgroUuid;
 
     /**
      * 群会话Uuid
      */
-    @ApiModelProperty(value = "", notes = "群会话Uuid", example = "")
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgroChatUuid;
 
     /**
      * 群名字64
      */
-    @ApiModelProperty(value = "", notes = "群名字64", example = "")
     private String cgroName;
 
     /**
      * 群创建者Uuid
      */
-    @ApiModelProperty(value = "", notes = " 群创建者Uuid", example = "")
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgroCsuseUuid;
 
     /**
      * 群创建者名片
      */
-    @ApiModelProperty(value = "", notes = " 群创建者名片", example = "")
     private String cgroCsuseName;
 
     /**
      * 群是否公开 0：公开 1：不公开
      */
-    @ApiModelProperty(value = "", notes = "群是否公开 0：公开 1：不公开", example = "")
     private Integer cgroPublic;
 
     /**
      * 群成员数最多256
      */
-    @ApiModelProperty(value = "", notes = "群成员数最多256", example = "")
     private Integer cgroCount;
 
-    @ApiModelProperty(value = "", notes = "群成员数列表", example = "")
+    /**
+     * 群成员列表
+     */
     List<ChatGroupUser> chatGroupUserList;
 
     /**
      * 创建时间
      */
-    @ApiModelProperty(value = "", notes = "创建时间", example = "")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createTime;
 
-    //群修改之前的名字
+    /**
+     * 群修改之前的名字
+     */
     private String oldCgroName;
 
     public String getOldCgroName() {

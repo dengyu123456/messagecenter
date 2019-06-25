@@ -1,27 +1,25 @@
 package com.zhkj.nettyserver.message.domain.request;
 
-import io.swagger.annotations.ApiModelProperty;
-
-import javax.validation.constraints.NotNull;
-
 /**
  * Des:编辑群成员
  * ClassName: EditUpdateChatGroupParams
  * Author: dengyi
  * Date: 2019-06-20 09:27
  */
-//编辑群成员
 public class EditUpdateChatGroupParams {
-    @ApiModelProperty(value = "",notes = "群参与用户Uuid/t",example = "")
-    @NotNull
+    /**
+     * 群参与用户Uuid
+     */
     private Long cgusSuseUuid;
 
-    @ApiModelProperty(value = "",notes = "群Uuid/t",example = "")
-    @NotNull(message = "请指定群Uuid")
+    /**
+     * 指定群Uuid
+     */
     private Long cgusCgroUuid;
 
-    @ApiModelProperty(value = "",notes = "被拉人Uuid/t",example = "")
-    @NotNull(message = "请指定编辑的群成员")
+    /**
+     * 请指定编辑的群成员
+     */
     private Long userUuid[];
 
     public Long getCgusSuseUuid() {

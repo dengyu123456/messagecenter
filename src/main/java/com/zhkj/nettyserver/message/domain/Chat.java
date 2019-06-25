@@ -1,5 +1,10 @@
 package com.zhkj.nettyserver.message.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
+import com.alibaba.fastjson.serializer.SerializeConfig;
+import com.alibaba.fastjson.serializer.ToStringSerializer;
+import com.fasterxml.jackson.annotation.JsonFilter;
+
 import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -31,7 +36,7 @@ public class Chat {
      * 一对一会话参与者Uuid
      */
     @Column(name = "chat_esuse_uuid")
-    private Long chatEsuseUuid;
+    protected Long chatEsuseUuid;
 
     /**
      * 会话是否公开 0：公开 1：不公开

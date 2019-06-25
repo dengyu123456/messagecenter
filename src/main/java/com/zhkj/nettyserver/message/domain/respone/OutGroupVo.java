@@ -24,24 +24,33 @@ import javax.validation.constraints.NotNull;
  * Date: 2018/11/20
  * Time: 11:32
  */
-@ApiModel(value = "OutGroupParams", description = "退出群返回参数")
 public class OutGroupVo {
 
-    @ApiModelProperty(value = "",notes = "退出群的用户Uuid/t",example = "")
+    /**
+     * 用户Uuid
+     */
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgusSuseUuid;
 
-    //用户姓名
+    /**
+     * 用户姓名
+     */
     private String cgroSuseName;
 
-    @ApiModelProperty(value = "",notes = "群号码Uuid/t",example = "")
+    /**
+     * 群号码Uuid
+     */
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgroUuid;
 
-    //群名字
+    /**
+     * 群名字
+     */
     private String cgroName;
 
-    @ApiModelProperty(value = "",notes = "群chatUuid/t",example = "")
+    /**
+     * 群会话Uuid
+     */
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgroChatUuid;
 

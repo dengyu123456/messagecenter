@@ -24,58 +24,47 @@ import java.util.List;
  * Date: 2018/11/8
  * Time: 0:56
  */
-@ApiModel(value = "OpenGroupVO",description = "创建群VO")
 public class OpenGroupVO {
     /**
      * 群Uuid
      */
-    @ApiModelProperty(value = "",notes = "群Uuid",example ="" )
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgroUuid;
 
     /**
      * 群名字64
      */
-    @ApiModelProperty(value = "",notes = "群名字64",example ="" )
     private String cgroName;
 
     /**
      * 群创建者Uuid
      */
-    @ApiModelProperty(value = "",notes = "群创建者Uuid",example ="" )
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long cgroCsuseUuid;
 
-    //群创建者名字
+    /**
+     * 群创建者名字
+     */
     private String cgroCsuseName;
+
     /**
      * 群是否公开 0：公开 1：不公开
      */
-    @ApiModelProperty(value = "",notes = " 群是否公开 0：公开 1：不公开",example ="" )
     private Integer cgroPublic;
 
     /**
      * 群成员数最多256
      */
-    @ApiModelProperty(value = "",notes = "群成员数最多256",example ="" )
     private Integer cgroCount;
 
-    @ApiModelProperty(value = "",notes = "群成员数列表",example = "")
+    /**
+     * 群成员列表
+     */
     List<ChatGroupUser> chatGroupUserList;
-
-    public List<ChatGroupUser> getChatGroupUserList() {
-        return chatGroupUserList;
-    }
-
-    public void setChatGroupUserList(List<ChatGroupUser> chatGroupUserList) {
-        this.chatGroupUserList = chatGroupUserList;
-    }
 
     /**
      * 创建时间
      */
-    @ApiModelProperty(value = "",notes = "创建时间yyyy-MM-dd HH:mm:ss",example ="" )
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createTime;
 
     public Long getCgroUuid() {
@@ -133,4 +122,13 @@ public class OpenGroupVO {
     public void setCgroCsuseName(String cgroCsuseName) {
         this.cgroCsuseName = cgroCsuseName;
     }
+
+    public List<ChatGroupUser> getChatGroupUserList() {
+        return chatGroupUserList;
+    }
+
+    public void setChatGroupUserList(List<ChatGroupUser> chatGroupUserList) {
+        this.chatGroupUserList = chatGroupUserList;
+    }
+
 }

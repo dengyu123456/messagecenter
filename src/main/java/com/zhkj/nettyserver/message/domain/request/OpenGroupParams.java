@@ -21,25 +21,21 @@ import java.util.List;
  * Date: 2018/11/8
  * Time: 0:56
  */
-@ApiModel(value = "OpenGroupParams",description = "创建群参数")
+
 public class OpenGroupParams {
     /**
      * 会话名字64位
      */
-    @Length(min = 1,max = 64,message = "会话名字<1~64位>")
     private String chatName;
 
     /**
      * 发起会话方Uuid
      */
-    @NotNull(message = "请指定发起会话方/t")
     private Long sSuseUuid;
 
     /**
      * 接受会话方Uuid
      */
-    @NotNull(message = "请指定参与会话方/t")
-    @Size(min = 1,max = 255,message = "参与会话方<1~255人>")
     private List<Long> eSuseUuid;
 
     public String getChatName() {

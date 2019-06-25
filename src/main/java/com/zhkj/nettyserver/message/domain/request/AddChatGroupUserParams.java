@@ -1,22 +1,20 @@
 package com.zhkj.nettyserver.message.domain.request;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
-import javax.validation.constraints.NotNull;
-
-@ApiModel(value = "AddChatGroupUserParams",description = "新增群成员参数")
 public class AddChatGroupUserParams {
-    @ApiModelProperty(value = "",notes = "群参与用户Uuid/t",example = "")
-    @NotNull
+
+    /**
+     * 群参与用户Uuid
+     */
     private Long cgusSuseUuid;
 
-    @ApiModelProperty(value = "",notes = "群Uuid/t",example = "")
-    @NotNull(message = "请指定群Uuid")
+    /**
+     * 群Uuid
+     */
     private Long cgusCgroUuid;
 
-    @ApiModelProperty(value = "",notes = "被拉人Uuid/t",example = "")
-    @NotNull(message = "请指定被拉人Uuid")
+    /**
+     * 被拉人Uuid列表
+     */
     private Long userUuid[];
 
     public Long getCgusSuseUuid() {

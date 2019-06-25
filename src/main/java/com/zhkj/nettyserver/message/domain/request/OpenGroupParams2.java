@@ -7,11 +7,6 @@
  */
 package com.zhkj.nettyserver.message.domain.request;
 
-import io.swagger.annotations.ApiModel;
-import org.hibernate.validator.constraints.Length;
-
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.util.List;
 
 /**
@@ -21,25 +16,20 @@ import java.util.List;
  * Date: 2018/11/8
  * Time: 0:56
  */
-@ApiModel(value = "OpenGroupParams2",description = "创建群参数")
 public class OpenGroupParams2 {
     /**
      * 会话名字64位
      */
-    @Length(min = 1,max = 64,message = "会话名字<1~64位>")
     private String cgorName;
 
     /**
      * 发起会话方Uuid
      */
-    @NotNull(message = "请指定创建群用户/t")
     private Long sSuseUuid;
 
     /**
      * 接受会话方Uuid
      */
-    @NotNull(message = "请指定参与用户/t")
-    @Size(min = 1,max = 255,message = "参与群用户<1~255人>")
     private List<Long> eSuseUuid;
 
     public String getCgorName() {

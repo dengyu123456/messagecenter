@@ -12,7 +12,7 @@ public interface ChatMapper extends Mapper<Chat> {
 
     List<Chat> selectChatBySuseUuid(@Param("suseUuid") Long suseUuid, @Param("isAll") boolean isAll, @Param("chatType") Integer chatType);
 
-    int updateSubCountByChatUuid(Long cgroChatUuid);
+    int updateSubCountByChatUuid(@Param("cgroChatUuid") Long cgroChatUuid);
 
     void updateChatCountByChatUuid(@Param("chatUuid") Long cgroChatUuid);
 

@@ -21,18 +21,21 @@ import javax.validation.constraints.NotNull;
  * Date: 2018/11/13
  * Time: 08:56
  */
-@ApiModel(value = "OutGroupParams", description = "退出群参数")
 public class OutGroupParams {
 
-    @ApiModelProperty(value = "",notes = "退出群的用户Uuid/t",example = "")
-    @NotNull(message = "请指定退出群的用户")
+    /**
+     * 退出群的用户Uuid
+     */
     private Long cgusSuseUuid;
 
-    @ApiModelProperty(value = "",notes = "群号码Uuid/t",example = "")
-    @NotNull(message = "请指定群号码")
+    /**
+     * 群号码Uuid
+     */
     private Long cgusCgroUuid;
 
-    //新群主 如果是群主退群，指定一个新的群主 不指定默认按照加群顺序指定群主
+    /**
+     * 新群主 如果是群主退群，指定一个新的群主 不指定默认按照加群顺序指定群主
+     */
     private Long newGroupOwnerUuid;
 
     public Long getNewGroupOwnerUuid() {

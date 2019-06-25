@@ -11,5 +11,5 @@ import java.util.List;
 public interface ChatGroupUserMapper extends Mapper<ChatGroupUser> {
     ChatGroupUser selectMinGroupUser(Long cgroUuid);
 
-    List<Long> selectOldGroupUser(@Param("EditChatGroup") Long cgroUuid,@Param("cgusSuseUuid") List<Long> cgusSuseUuid);
+    List<Long> selectOldGroupUser(@Param("cgroUuid") Long cgroUuid,@Param("cgusSuseUuid") List<Long> cgusSuseUuid);
 }

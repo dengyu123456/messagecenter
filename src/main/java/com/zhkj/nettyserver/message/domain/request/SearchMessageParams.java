@@ -7,11 +7,6 @@
  */
 package com.zhkj.nettyserver.message.domain.request;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
-import javax.validation.constraints.NotNull;
-
 /**
  * Des:
  * ClassName: SearchMessageParams
@@ -19,27 +14,20 @@ import javax.validation.constraints.NotNull;
  * Date: 2018/11/11
  * Time: 14:24
  */
-@ApiModel(value = "SearchMessageParams",description = "搜索消息参数")
 public class SearchMessageParams {
     /**
      * 会话Uuid
      */
-    @ApiModelProperty(value = "",notes = "会话Uuid/t",example = "")
-    @NotNull(message = "请指定会话")
     private Long messChatUuid;
 
     /**
      * 消息开始时间
      */
-    @ApiModelProperty(value = "",notes = "消息开始时间/t",example = "")
-    @NotNull(message = "请指定消息开始时间")
     private Long messStartDate;
 
     /**
      * 消息结束时间
      */
-    @ApiModelProperty(value = "",notes = "消息结束时间/t",example = "")
-    @NotNull(message = "请指定消息结束时间")
     private Long messEndDate;
 
     public Long getMessChatUuid() {

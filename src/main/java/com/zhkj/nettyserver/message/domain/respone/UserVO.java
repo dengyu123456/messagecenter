@@ -8,46 +8,37 @@ import io.swagger.annotations.ApiModelProperty;
 
 import java.util.Date;
 
-@ApiModel(value = "UserVO",description = "用户VO")
 public class UserVO {
     /**
      * 用户uuid
      */
-    @ApiModelProperty(value = "",notes = "用户uuid",example = "")
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long userUuid;
 
     /**
      * 用户名字
      */
-    @ApiModelProperty(value = "",notes = "用户名字",example = "")
     private String userName;
 
     /**
      * 是否是后端操作员 0：是 1：否
      */
-    @ApiModelProperty(value = "",notes = "是否是后端操作员 0：是 1：否",example = "")
     private Integer userType;
 
     /**
      * 头像地址
      */
-    @ApiModelProperty(value = "",notes = "头像地址",example = "")
     private String userHead;
 
 
     /**
      * 创建时间
      */
-    @ApiModelProperty(value = "",notes = "创建时间yyyy-MM-dd HH:mm:ss",example = "")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date createTime;
 
     /**
      * 更新时间
      */
-    @ApiModelProperty(value = "",notes = "更新时间yyyy-MM-dd HH:mm:ss",example = "")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date updateTime;
 
     public Long getUserUuid() {

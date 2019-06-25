@@ -26,7 +26,7 @@
 
 
     <select id="selectChatBySuseUuid" resultMap="BaseResultMap">
-        SELECT c.* FROM chat c WHERE c.chat_uuid IN
+        SELECT c.* FROM chat c WHERE c.chat_public=1 AND c.chat_uuid IN
         (SELECT cuse.cuse_chat_uuid FROM chat_user cuse
         <where>
             <if test="suseUuid != null">

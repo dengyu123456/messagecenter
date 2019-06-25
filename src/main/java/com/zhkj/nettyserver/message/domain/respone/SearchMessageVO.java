@@ -20,47 +20,39 @@ import io.swagger.annotations.ApiModelProperty;
  * Date: 2018/11/8
  * Time: 0:52
  */
-@ApiModel(value = "SearchMessageVO",description = "消息VO")
 public class SearchMessageVO {
 
     /**
      * 会话Uuid
      */
-    @ApiModelProperty(value = "",notes = "会话Uuid",example = "")
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long messChatUuid;
 
     /**
      * 消息发出者Uuid
      */
-    @ApiModelProperty(value = "",notes = "消息发出者Uuid",example = "")
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long messSuseUuid;
 
     /**
      * 消息发出者用户名
      */
-    @ApiModelProperty(value = "",notes = "消息发出者用户名",example = "")
     private String messSuseName;
 
     /**
      * 消息时间戳yyyy-MM-dd HH:mm:ss
      */
-    @ApiModelProperty(value = "",notes = "消息时间戳yyyy-MM-dd HH:mm:ss",example = "")
-//    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @JSONField(serializeUsing = ToStringSerializer.class)
     private Long messDate;
 
     /**
      * 消息类型0：普通消息
      */
-    @ApiModelProperty(value = "",notes = "消息类型0：普通消息",example = "")
     private Integer messContentType;
 
     /**
      * 消息内容
      */
-    @ApiModelProperty(value = "",notes = "消息内容",example = "")
     private String messContent;
 
     public Long getMessChatUuid() {

@@ -529,7 +529,6 @@ public class MessageServiceImpl implements MessageService {
      * @param params
      * @return
      */
-    @Transactional
     @Override
     public Long outGroup(OutGroupParams params) throws RuntimeException {
         int count = 0;
@@ -543,7 +542,7 @@ public class MessageServiceImpl implements MessageService {
 
         ChatGroupUser chatGroupUser = new ChatGroupUser();
         chatGroupUser.setCgusDataStutus(1);
-//        更新退群人状态
+        //更新退群人状态
         count += this.chatGroupUserMapper.updateByExampleSelective(chatGroupUser, Example.builder(ChatGroupUser.class).andWhere(Sqls
                 .custom().andEqualTo("cgusUuid", selectChatGroupUser.getCgusUuid())).build());
         //人退出群的时候减一 （人数大于0的时候执行此操作）
@@ -568,20 +567,24 @@ public class MessageServiceImpl implements MessageService {
 //            }
 //
 //        }
-        if (chatGroup.getCgroCount().equals(0) || chatGroup.getCgroCsuseUuid() == param.getCgusSuseUuid()) {
-//            更新群状态为删除状态
+        if (chatGroup.getCgroCount().equals(0) || chatGroup.getCgroCsuseUuid().equals(param.getCgusSuseUuid())) {
+            //更新群状态为删除状态
             ChatGroup chatGroup1 = new ChatGroup();
             chatGroup1.setCgroDataStatus(1);
             count += this.chatGroupMapper.updateByExampleSelective(chatGroup1, Example.builder(ChatGroup.class).andWhere(Sqls.custom().
                     andEqualTo("cgroUuid", selectChatGroupUser.getCgusCgroUuid())).build());
+            Chat chat = new Chat();
+            chat.setChatPublic(0);
+            this.chatMapper.updateByExampleSelective(chat, Example.builder(Chat.class).andWhere(Sqls.custom()
+                    .andEqualTo("chatUuid", chatGroup.getCgroChatUuid())).build());
             throw new RuntimeException("该群已解散");
         }
 
-        //        更新会话人数（减一）
+        //更新会话人数（减一）
         count += this.chatMapper.updateSubCountByChatUuid(chatGroup.getCgroChatUuid());
-        //        更新chat_user表的用户状态为删除
+        //更新chat_user表的用户状态为删除
         if (chatGroup.getCgroChatUuid() == null) {
-            //            删除群用户
+            //删除群用户
             this.chatUserMapper.deleteByExample(Example.builder(ChatUser.class).andWhere(Sqls.custom().
                     andEqualTo("cuseSuseUuid", params.getCgusSuseUuid()).andEqualTo("cuseChatUuid", chatGroup.getCgroChatUuid())).build());
         } else {//更新会话用户
@@ -591,11 +594,10 @@ public class MessageServiceImpl implements MessageService {
             count += this.chatUserMapper.updateByExampleSelective(chatUser, Example.builder(ChatUser.class).andWhere(Sqls.custom().
                     andEqualTo("cuseSuseUuid", params.getCgusSuseUuid()).andEqualTo("cuseChatUuid", chatGroup.getCgroChatUuid())).build());
         }
-//        更新chat表的会话人数减一
+        //更新chat表的会话人数减一
         if (chatGroup == null) {
             throw new RuntimeException("不存存在该群");
         } else {
-//            手写sql方式  会话人数减一
             this.chatMapper.updateChatCountByChatUuid(chatGroup.getCgroChatUuid());
         }
         if (count < 4) {
@@ -655,26 +657,16 @@ public class MessageServiceImpl implements MessageService {
             if (chatGroupUser1 != null) {
                 throw new RuntimeException("该用户已存在该群");
             }
-
-
-//      增加群成员
+            //增加群成员
             ChatGroupUser chatGroupUser = new ChatGroupUser();
-//        会话uuid 主键
             chatGroupUser.setCgusUuid(UuidUtil.gen());
-//        群员ID
             chatGroupUser.setCgusSuseUuid(params.getUserUuid()[i]);
-//        数据状态
             chatGroupUser.setCgusDataStutus(0);
-//            群成员姓名
             chatGroupUser.setCgusName(user1.getUserName());
-//         添加顺序
             chatGroupUser.setCgusOrder(this.chatGroupUserMapper.selectCountByExample(Example.builder(ChatGroupUser.class).
                     andWhere(Sqls.custom().andEqualTo("cgusCgroUuid", params.getCgusCgroUuid())).build()) + 1);
-//        群uuid
             chatGroupUser.setCgusCgroUuid(params.getCgusCgroUuid());
-//        创建时间
             chatGroupUser.setCreateTime(new Date(System.currentTimeMillis()));
-
             count += this.chatGroupUserMapper.insertSelective(chatGroupUser);
             if (count == 0) {
                 throw new RuntimeException("新增失败");
@@ -682,11 +674,13 @@ public class MessageServiceImpl implements MessageService {
             //更新群人数(群人数加一)
             count += this.chatGroupMapper.updateAddCountByCgroUuid(params.getCgusCgroUuid());
             //更新会话人数
-            count += this.chatMapper.updateSubCountByChatUuid(params.getUserUuid()[i]);
+
             if (count < 2) {
                 throw new RuntimeException("新增失败");
             }
         }
+        ChatGroup chatGroup = this.selectChatGroupByCgroUuid(params.getCgusCgroUuid());
+        count += this.chatMapper.updateChatCount(chatGroup.getCgroChatUuid(), -(params.getUserUuid().length));
         return count;
     }
 
@@ -721,7 +715,7 @@ public class MessageServiceImpl implements MessageService {
             int count = this.chatGroupUserMapper.deleteByExample(Example.builder(ChatGroupUser.class).
                     andWhere(Sqls.custom().andEqualTo("cgusSuseUuid", params.getCgusUuid()[i]).andEqualTo("cgusCgroUuid", params.getCgroUuid())).build());
             sumCount[i] = count;
-//            更新最近会话
+            //更新最近会话
             chatGroup = this.chatGroupMapper.selectOneByCgroUuid(params.getCgroUuid());
 
             ChatUser chatUser = new ChatUser();
@@ -789,7 +783,6 @@ public class MessageServiceImpl implements MessageService {
      */
     @Override
     public User selectUserByUserUuid(Long sSuseUuid) {
-//        手写mysql 语句
         return this.userMapper.selectUserByUserUuid(sSuseUuid);
     }
 
@@ -802,7 +795,6 @@ public class MessageServiceImpl implements MessageService {
      */
     @Override
     public List<Long> selectOldGroupUser(Long cgroUuid, Long[] userArr) {
-
         return this.chatGroupUserMapper.selectOldGroupUser(cgroUuid, Arrays.asList(userArr));
     }
 

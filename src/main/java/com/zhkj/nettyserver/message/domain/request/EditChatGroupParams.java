@@ -1,27 +1,30 @@
 package com.zhkj.nettyserver.message.domain.request;
 
-import io.swagger.annotations.ApiModel;
-import io.swagger.annotations.ApiModelProperty;
-
-import javax.validation.constraints.NotNull;
-
-@ApiModel(value = "EditChatGroupParams",description = "修改群信息参数")
 public class EditChatGroupParams {
 
-    @ApiModelProperty(value = "",notes = "群Uuid/t",example = "")
-    @NotNull
+    /**
+     * 群Uuid
+     */
     private Long cgroUuid;
 
-    @ApiModelProperty(value = "",notes = "群名字64",example = "")
+    /**
+     * 群名字
+     */
     private String cgroName;
 
-    @ApiModelProperty(value = "",notes = "群是否公开 0：公开 1：不公开",example = "")
+    /**
+     * 群是否公开 0：公开 1：不公开
+     */
     private Integer cgroPublic;
 
-    @ApiModelProperty(value = "",notes = "数据是否正常0：正常1：删除",example = "")
+    /**
+     * 数据是否正常0：正常1：删除
+     */
     private Integer cgroDataStatus;
 
-    //修改之前的名字
+    /**
+     * 群修改之前的名字
+     */
     private String oldCgroName;
 
     public String getOldCgroName() {
