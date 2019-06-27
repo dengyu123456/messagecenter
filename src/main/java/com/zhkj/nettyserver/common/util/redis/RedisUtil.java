@@ -187,7 +187,7 @@ public class RedisUtil {
                 jedis.close();
             }
         }
-        if (resulStr.equals("nil")){
+        if ("nil".equals(resulStr)){
             return null;
         }else{
             return JSON.parseObject(resulStr,t);

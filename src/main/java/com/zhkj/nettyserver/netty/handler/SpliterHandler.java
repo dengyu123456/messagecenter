@@ -17,7 +17,7 @@ import java.util.Map;
  */
 public class SpliterHandler extends SimpleChannelInboundHandler<Request> {
 
-    private Map<String, SimpleChannelInboundHandler> handlerMap;
+    private  Map<String, SimpleChannelInboundHandler> handlerMap;
 
     //解码映射表
     Map<String, Class> codecMap = null;

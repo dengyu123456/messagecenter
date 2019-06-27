@@ -74,7 +74,7 @@ public class LoginHandler extends SimpleChannelInboundHandler<Object> {
      */
     private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
 
-        // 如果HTTP解码失败，返回HTTP异常
+        // 如果HTTP解码失败，返回HTTP异常  升级握手
         if (!request.decoderResult().isSuccess() || (!"websocket".equals(request.headers().get("Upgrade")))) {//
             sendHttpResponse(ctx, request, new DefaultFullHttpResponse(HTTP_1_1, BAD_REQUEST));
             return;

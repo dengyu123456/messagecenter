@@ -297,7 +297,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     /**
-     * 根据企业/公司Uuid获取用户列表
+     * 根据企业/公司Uuid获取好友列表
      *
      * @param userEnteUuid
      * @return
@@ -310,7 +310,10 @@ public class MessageServiceImpl implements MessageService {
         if (!isAll) {
             params.setUserDataStatus(0);
         }
-        List<User> userList = this.userMapper.selectByExample(Example.builder(User.class).andWhere(Sqls.custom().andEqualTo("userEnteUuid", userEnteUuid).andEqualTo("userType", 0).andEqualTo("userDataStatus", params.getUserDataStatus()).andNotEqualTo("userUuid", suseUuid)).build());
+        List<User> userList = null;
+        if (userEnteUuid != null) {
+            userList = this.userMapper.selectByExample(Example.builder(User.class).andWhere(Sqls.custom().andEqualTo("userEnteUuid", userEnteUuid).andEqualTo("userType", 0).andEqualTo("userDataStatus", params.getUserDataStatus()).andNotEqualTo("userUuid", suseUuid)).build());
+        }
         return userList;
 //        return this.userMapper.select(params);
     }

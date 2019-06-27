@@ -1,5 +1,6 @@
 package com.zhkj.nettyserver.netty;
 
+import com.zhkj.nettyserver.netty.handler.AuthenHandler;
 import com.zhkj.nettyserver.netty.handler.CodecHandler;
 import com.zhkj.nettyserver.netty.handler.LoginHandler;
 import com.zhkj.nettyserver.netty.handler.SpliterHandler;
@@ -26,9 +27,10 @@ public class CustomChannelInitializer extends ChannelInitializer {
         pipeline.addLast("http-chunked", new ChunkedWriteHandler()); // WebSocket通信支持
       //  pipeline.addLast("handler",new CustomHandler());//
 
-        pipeline.addLast("login",new LoginHandler());
-        pipeline.addLast("codec",new CodecHandler());
-        pipeline.addLast("split",new SpliterHandler());
+        pipeline.addLast("login",new LoginHandler()); //登录
+        pipeline.addLast("Authen",new AuthenHandler());//认证
+        pipeline.addLast("codec",new CodecHandler());//编码解码
+        pipeline.addLast("split",new SpliterHandler());//分发
 
     }
 }

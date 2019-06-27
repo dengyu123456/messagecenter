@@ -5,9 +5,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -20,12 +18,11 @@ public class ChannelUtil {
 
     //公司层封装
 
-    private ConcurrentHashMap<Long, ConcurrentHashMap<Long, Channel>> echaMap = null;
+    private Map<Long, ConcurrentHashMap<Long, Channel>> echaMap = null;
 
-    //private ConcurrentHashMap<Long, Channel> chalMap = null;
 
     private ChannelUtil() {
-        this.echaMap = new ConcurrentHashMap<>();
+        this.echaMap = new HashMap<>();
     }
 
     private static class Holder {
@@ -58,7 +55,7 @@ public class ChannelUtil {
 //    }
 
     //移除管道
-    public void unBindChannel(Channel channel,Long suseUuid) {
+    public void unBindChannel(Channel channel, Long suseUuid) {
         Long enteUuid = channel.attr(Attributes.ENTE).get();
         this.echaMap.get(enteUuid).remove(suseUuid);
     }
@@ -83,6 +80,17 @@ public class ChannelUtil {
         return this.echaMap.get(enteUuid).get(suseUuid);
     }
 
+    public Channel getChannel(Long suseUuid) {
+        for (ConcurrentHashMap<Long, Channel> chalMap : echaMap.values()) {
+            for (Channel item : chalMap.values()) {
+                if (item.attr(Attributes.SESSION).get() == suseUuid) {
+                    return item;
+                }
+            }
+        }
+        return null;
+    }
+
     //获取所有管道
     public ChannelGroup getChannelGroup(ChannelHandlerContext ctx) {
         ChannelGroup channelGroup = new DefaultChannelGroup(ctx.executor());
@@ -94,9 +102,21 @@ public class ChannelUtil {
         return channelGroup;
     }
 
+
     //获取公司下的所有管道映射
-    public ConcurrentHashMap<Long,Channel> getChalMap(Long enteUuid) {
+    public ConcurrentHashMap<Long, Channel> getChalMap(Long enteUuid) {
         return this.echaMap.get(enteUuid);
     }
 
+    public List<Channel> getAllChannel() {
+        List<Channel> channelList = new ArrayList<Channel>();
+        for (ConcurrentHashMap<Long, Channel> chalMap : echaMap.values()) {
+            for (Channel item : chalMap.values()) {
+                if (item != null && item.isActive()) {
+                    channelList.add(item);
+                }
+            }
+        }
+        return channelList;
+    }
 }
