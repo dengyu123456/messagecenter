@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zhkj.nettyserver.weixin.dao.EnterpriseWeixinMapper">
+  <resultMap id="BaseResultMap" type="com.zhkj.nettyserver.weixin.domain.EnterpriseWeixin">
+    <!--
+      WARNING - @mbg.generated
+    -->
+    <id column="id" jdbcType="BIGINT" property="id" />
+    <result column="ewxi_uuid" jdbcType="BIGINT" property="ewxiUuid" />
+    <result column="ewxi_ente_uuid" jdbcType="BIGINT" property="ewxiEnteUuid" />
+    <result column="ewxi_appid" jdbcType="VARCHAR" property="ewxiAppid" />
+    <result column="ewxi_secret" jdbcType="VARCHAR" property="ewxiSecret" />
+    <result column="ewxi_access_token" jdbcType="VARCHAR" property="ewxiAccessToken" />
+    <result column="ewxi_wtms_allow" jdbcType="BIT" property="ewxiWtmsAllow" />
+    <result column="ewxi_last_time" jdbcType="BIGINT" property="ewxiLastTime" />
+  </resultMap>
+</mapper>
