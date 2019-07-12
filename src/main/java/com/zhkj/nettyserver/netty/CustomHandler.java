@@ -2,9 +2,6 @@ package com.zhkj.nettyserver.netty;
 
 
 import com.alibaba.fastjson.JSON;
-import com.zhkj.nettyserver.common.base.TokenUtil;
-import com.zhkj.nettyserver.common.base.TokenVO;
-import com.zhkj.nettyserver.common.base.request.Request;
 import com.zhkj.nettyserver.common.base.respone.ResponseStomp;
 import com.zhkj.nettyserver.common.base.respone.ResponseStompFactory;
 import com.zhkj.nettyserver.common.util.*;
@@ -15,7 +12,10 @@ import com.zhkj.nettyserver.message.service.MessageService;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
-import io.netty.handler.codec.http.*;
+import io.netty.handler.codec.http.DefaultFullHttpResponse;
+import io.netty.handler.codec.http.FullHttpRequest;
+import io.netty.handler.codec.http.FullHttpResponse;
+import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.websocketx.*;
 import io.netty.util.CharsetUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -89,23 +89,12 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
         if (handshaker == null) { // 无法处理的websocket版本
             WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
         } else { // 向客户端发送websocket握手,完成握手
-            String tokenStr = request.uri().substring(request.uri().indexOf("=") + 1, request.uri().length());
-            if (StringUtil.isBlank(tokenStr)) {//token 不存在
-                WebSocketServerHandshakerFactory.sendUnsupportedVersionResponse(ctx.channel());
-            } else if (ChannelUtil.getInstance().getSuseUuid(ctx.channel()) == null) {
-                TokenVO vo = TokenUtil.getToken(tokenStr);
-                if (vo == null) {
-                    sendHttpResponse(ctx, request, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.UNAUTHORIZED));
-                } else if (vo.getOt() < (24 * 60 * 60 * 1000 * 7 + System.currentTimeMillis())) {
-                    sendHttpResponse(ctx, request, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FORBIDDEN));
-                } else {//没有问题
-                    User user = messageService.selectUserByUserUuid(Long.valueOf(vo.getUuid()));
-                    ChannelUtil.getInstance().bindChannel(user == null ? null : user.getUserEnteUuid(), Long.valueOf(vo.getUuid()), ctx.channel());
+
                     handshaker.handshake(ctx.channel(), request);
                 }
             }
-        }
-    }
+
+
 
     /**
      * Http返回
@@ -157,38 +146,39 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
 //        if (this.handshaker == null || ctx == null || ctx.isRemoved()) {
 //            throw new Exception("尚未握手成功，无法向客户端发送WebSocket消息");
 //        }
-            Request reqOb = JSON.parseObject(text, Request.class);
-            System.out.println(reqOb.getAction());
+            sendWebSocket(ctx.channel(),text);
+//            Request reqOb = JSON.parseObject(text, Request.class);
+//            System.out.println(reqOb.getAction());
             //发送消息
-            if ("chat".equals(reqOb.getAction())) {
-                chat(reqOb.getParams(), ctx.channel());
-            } else if ("chatOpen".equals(reqOb.getAction())) {//开启会话
-                openChat(reqOb.getParams(), ctx.channel());
-            } else if ("chatList".equals(reqOb.getAction())) {//获取最近会话
-                chatList(reqOb.getParams(), ctx.channel());
-            } else if ("listFriend".equals(reqOb.getAction())) {//获取好友
-                listFriend(reqOb.getParams(), ctx.channel());
-            } else if ("openGroup2".equals(reqOb.getAction())) {//创建一个群
-                openGroup2(reqOb.getParams(), ctx.channel());
-            } else if ("listGroup".equals(reqOb.getAction())) {//获取群
-                listGroup(reqOb.getParams(), ctx.channel());
-            } else if ("outGroup".equals(reqOb.getAction())) {//退出群
-                outGroup(reqOb.getParams(), ctx.channel());
-//            } else if ("addGroup".equals(reqOb.getAction())) {//增加群成员
-//                addGroup(reqOb.getParams(), ctx.channel());
-//            } else if ("delGroup".equals(reqOb.getAction())) {//删除群成员
-//                delGroup(reqOb.getParams(), ctx.channel());
-            } else if ("editGroup".equals(reqOb.getAction())) {//修改群
-                editGroup(reqOb.getParams(), ctx.channel());
-            } else if ("editGroupUser".equals(reqOb.getAction())) {//修改群名片
-                editGroupUser(reqOb.getParams(), ctx.channel());
-            } else if ("listMsg".equals(reqOb.getAction())) {//获取会话消息列表
-                listMsg(reqOb.getParams(), ctx.channel());
-            } else if ("updateGroup".equals(reqOb.getAction())) {//修改群成员
-                editUpdateGroupUser(reqOb.getParams(), ctx.channel());
-            } else if ("schat".equals(reqOb.getAction())) {//系统消息
-                schat(reqOb.getParams(), ctx);
-            }
+//            if ("chat".equals(reqOb.getAction())) {
+//                chat(reqOb.getParams(), ctx.channel());
+//            } else if ("chatOpen".equals(reqOb.getAction())) {//开启会话
+//                openChat(reqOb.getParams(), ctx.channel());
+//            } else if ("chatList".equals(reqOb.getAction())) {//获取最近会话
+//                chatList(reqOb.getParams(), ctx.channel());
+//            } else if ("listFriend".equals(reqOb.getAction())) {//获取好友
+//                listFriend(reqOb.getParams(), ctx.channel());
+//            } else if ("openGroup2".equals(reqOb.getAction())) {//创建一个群
+//                openGroup2(reqOb.getParams(), ctx.channel());
+//            } else if ("listGroup".equals(reqOb.getAction())) {//获取群
+//                listGroup(reqOb.getParams(), ctx.channel());
+//            } else if ("outGroup".equals(reqOb.getAction())) {//退出群
+//                outGroup(reqOb.getParams(), ctx.channel());
+////            } else if ("addGroup".equals(reqOb.getAction())) {//增加群成员
+////                addGroup(reqOb.getParams(), ctx.channel());
+////            } else if ("delGroup".equals(reqOb.getAction())) {//删除群成员
+////                delGroup(reqOb.getParams(), ctx.channel());
+//            } else if ("editGroup".equals(reqOb.getAction())) {//修改群
+//                editGroup(reqOb.getParams(), ctx.channel());
+//            } else if ("editGroupUser".equals(reqOb.getAction())) {//修改群名片
+//                editGroupUser(reqOb.getParams(), ctx.channel());
+//            } else if ("listMsg".equals(reqOb.getAction())) {//获取会话消息列表
+//                listMsg(reqOb.getParams(), ctx.channel());
+//            } else if ("updateGroup".equals(reqOb.getAction())) {//修改群成员
+//                editUpdateGroupUser(reqOb.getParams(), ctx.channel());
+//            } else if ("schat".equals(reqOb.getAction())) {//系统消息
+//                schat(reqOb.getParams(), ctx);
+//            }
         }
     }
 
@@ -813,6 +803,12 @@ public class CustomHandler extends SimpleChannelInboundHandler<Object> {
     }
 
     public void sendWebSocket(Channel channel, ResponseStomp res) {
+        if (channel != null && channel.isActive()) {
+            channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(res)));
+        }
+    }
+
+    public void sendWebSocket(Channel channel, String res) {
         if (channel != null && channel.isActive()) {
             channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(res)));
         }

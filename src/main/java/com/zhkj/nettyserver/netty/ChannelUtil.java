@@ -83,9 +83,10 @@ public class ChannelUtil {
     public Channel getChannel(Long suseUuid) {
         for (ConcurrentHashMap<Long, Channel> chalMap : echaMap.values()) {
             for (Channel item : chalMap.values()) {
-                if (item.attr(Attributes.SESSION).get() == suseUuid) {
-                    return item;
-                }
+//                if (item.attr(Attributes.SESSION).get() == suseUuid) {
+//                    return item;
+//                }
+                return chalMap.get(suseUuid);
             }
         }
         return null;

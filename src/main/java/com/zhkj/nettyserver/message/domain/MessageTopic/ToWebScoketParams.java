@@ -1,7 +1,5 @@
 package com.zhkj.nettyserver.message.domain.MessageTopic;
 
-import java.util.List;
-
 /**
  * Des:发送到webscoket参数
  * ClassName: ToWebScoketParams
@@ -9,34 +7,47 @@ import java.util.List;
  * Date: 2019-06-28 15:50
  */
 public class ToWebScoketParams {
-    //消息接收人
-    private List<Long> userList;
+    //返回代码
+    private String code = "200";
 
-    private List<Long> enteList;
+    //返回错误信息
+    private String error;
 
-    private String content;
+    //操作方法action
+    private String action;
 
-    public List<Long> getUserList() {
-        return userList;
+    //返回参数
+    private Object params;
+
+    public String getCode() {
+        return code;
     }
 
-    public void setUserList(List<Long> userList) {
-        this.userList = userList;
+    public void setCode(String code) {
+        this.code = code;
     }
 
-    public List<Long> getEnteList() {
-        return enteList;
+    public String getError() {
+        return error;
     }
 
-    public void setEnteList(List<Long> enteList) {
-        this.enteList = enteList;
+    public void setError(String error) {
+        this.error = error;
     }
 
-    public String getContent() {
-        return content;
+    public String getAction() {
+        return action;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public Object getParams() {
+        return params;
+    }
+
+    public void setParams(Object params) {
+        this.params = params;
     }
 }

@@ -194,4 +194,40 @@ public class RedisUtil {
         }
     }
 
+    /**
+     * 发布消息
+     * @param channel
+     * @param message
+     */
+    public void publish(String channel,String message){
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            jedis.publish(channel,message);
+        }catch (Exception e){
+            LOGGER.error(e.getMessage(),e.getStackTrace());
+        }finally {
+            if (jedis != null){
+                jedis.close();
+            }
+        }
+    }
+
+    /**
+     * 订阅消息
+     * @param channel
+     */
+    public void psubscribe(String channel,CustomPubSub pubSub){
+        Jedis jedis = null;
+        try {
+            jedis = jedisPool.getResource();
+            jedis.psubscribe(pubSub, channel);
+        }catch (Exception e){
+            LOGGER.error(e.getMessage(),e.getStackTrace());
+        }finally {
+            if (jedis != null){
+                jedis.close();
+            }
+        }
+    }
 }

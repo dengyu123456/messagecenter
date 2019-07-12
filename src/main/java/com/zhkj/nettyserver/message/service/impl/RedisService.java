@@ -7,7 +7,8 @@
  */
 package com.zhkj.nettyserver.message.service.impl;
 
-import com.zhkj.nettyserver.common.util.StringUtil;
+import com.alibaba.fastjson.JSON;
+import com.zhkj.nettyserver.common.util.redis.CustomPubSub;
 import com.zhkj.nettyserver.common.util.redis.RedisUtil;
 import com.zhkj.nettyserver.message.domain.MessageTopic.Topic;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,17 +36,20 @@ public class RedisService {
      */
     @Async("taskExecutor")
     public void msgMonitor() {
-        while (true) {
-            Topic topic = redisUtil.rpop("Topic", Topic.class);
-            if (topic != null && StringUtil.isNotBlank(topic.getParams())) {
-                if (Topic.getTopicWs().equals(topic.getAction())) {
+        redisUtil.psubscribe("topic", new CustomPubSub() {
+            @Override
+            public void onPMessage(String pattern, String channel, String message) {
+                super.onPMessage(pattern, channel, message);
+                Topic topic = JSON.parseObject(message, Topic.class);
+                if (Topic.TOPIC_WS.equals(topic.getAction())) {
                     topicService.MsgToWebScoket(topic);
-                } else if (Topic.getTopicWx().equals(topic.getAction())) { //调用微信服务等 其他业务
-                    topicService.MsgToWX(topic);
+                } else if (Topic.TOPIC_WX.equals(topic.getAction())) { //调用微信服务等 其他业务
+//                    topicService.MsgToWX(topic);
                 } else if (false) {//发布到移动端
 
                 }
             }
-        }
+        });
     }
 }
+

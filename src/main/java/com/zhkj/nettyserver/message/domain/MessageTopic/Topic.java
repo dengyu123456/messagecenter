@@ -1,6 +1,8 @@
 package com.zhkj.nettyserver.message.domain.MessageTopic;
 
 
+import java.util.List;
+
 /**
  * Des:发布订阅参数
  * ClassName: Topic
@@ -10,31 +12,32 @@ package com.zhkj.nettyserver.message.domain.MessageTopic;
 public class Topic {
 
     //发送后台消息
-    static final String TOPIC_WS = "TOPIC_WS";
+    public static final String TOPIC_WS = "TOPIC_WS";
 
     //调用微信服务
-    static final String TOPIC_WX ="TOPIC_WX";
+    public static final String TOPIC_WX = "TOPIC_WX";
 
-    //
-    static final String TOPIC_EM="TOPIC_EM";
+    //em
+    public static final String TOPIC_EM = "TOPIC_EM";
 
     //指令
-    private String Action;
+    private String action;
 
     //消息体
     private String params;
 
+    //消息接收人
+    private List<String> userList;
 
-    public static String getTopicWs() {
-        return TOPIC_WS;
+    //消息接收公司
+    private List<String> enteList;
+
+    public String getAction() {
+        return action;
     }
 
-    public static String getTopicWx() {
-        return TOPIC_WX;
-    }
-
-    public static String getTopicEm() {
-        return TOPIC_EM;
+    public void setAction(String action) {
+        this.action = action;
     }
 
     public String getParams() {
@@ -45,11 +48,19 @@ public class Topic {
         this.params = params;
     }
 
-    public String getAction() {
-        return Action;
+    public List<String> getUserList() {
+        return userList;
     }
 
-    public void setAction(String action) {
-        Action = action;
+    public void setUserList(List<String> userList) {
+        this.userList = userList;
+    }
+
+    public List<String> getEnteList() {
+        return enteList;
+    }
+
+    public void setEnteList(List<String> enteList) {
+        this.enteList = enteList;
     }
 }
