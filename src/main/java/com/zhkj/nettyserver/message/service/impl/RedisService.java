@@ -42,11 +42,9 @@ public class RedisService {
                 super.onPMessage(pattern, channel, message);
                 Topic topic = JSON.parseObject(message, Topic.class);
                 if (Topic.TOPIC_WS.equals(topic.getAction())) {
-                    topicService.MsgToWebScoket(topic);
+                    topicService.msgToWebScoket(topic);
                 } else if (Topic.TOPIC_WX.equals(topic.getAction())) { //调用微信服务等 其他业务
 //                    topicService.MsgToWX(topic);
-                } else if (false) {//发布到移动端
-
                 }
             }
         });

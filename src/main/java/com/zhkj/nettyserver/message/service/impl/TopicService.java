@@ -26,7 +26,7 @@ public class TopicService {
     @Autowired
     private WeiXin weiXin;
 
-    public void MsgToWebScoket(Topic topic) {
+    public void msgToWebScoket(Topic topic) {
         ToWebScoketParams twsp = JSON.parseObject(topic.getParams(), ToWebScoketParams.class);
 
         List<String> userList = topic.getUserList();
@@ -40,7 +40,6 @@ public class TopicService {
                 item.writeAndFlush(twsp);
             }
         }
-
         if (CollectionUtil.isNotEmpty(userList)) {
             for (String item : userList) {
                 //发送给需要接收的人
@@ -68,9 +67,10 @@ public class TopicService {
 
     }
 
-//    //发送消息到微信
+    //    //发送消息到微信
 //    public void MsgToWX(Topic topic) {
 //        ToWeiXinParams twxp = JSON.parseObject(topic.getParams(), ToWeiXinParams.class);
 //        weiXin.sendTemplate(twxp.getEnteUuid(),twxp.getWtmsType(),twxp.getData());
 //    }
+
 }
