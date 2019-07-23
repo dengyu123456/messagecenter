@@ -92,7 +92,7 @@ public class LoginHandler extends SimpleChannelInboundHandler<Object> {
                 TokenVO vo = TokenUtil.getToken(tokenStr);
                 if (vo == null) {
                     sendHttpResponse(ctx, request, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.UNAUTHORIZED));
-                } else if (vo.getOt() < (24 * 60 * 60 * 1000 * 7 + System.currentTimeMillis())) {
+                } else if (vo.getOt() < System.currentTimeMillis() || (vo.getOt()-System.currentTimeMillis()) > 604800000) {
                     sendHttpResponse(ctx, request, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FORBIDDEN));
                 } else {//没有问题
                     User user = messageService.selectUserByUserUuid(Long.valueOf(vo.getUuid()));
