@@ -7,6 +7,7 @@ import com.zhkj.nettyserver.message.domain.MessageTopic.Topic;
 import com.zhkj.nettyserver.netty.ChannelUtil;
 import com.zhkj.nettyserver.weixin.WeiXin;
 import io.netty.channel.Channel;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
@@ -27,6 +28,7 @@ public class TopicService {
     private WeiXin weiXin;
 
     public void msgToWebScoket(Topic topic) {
+        System.out.println(topic.getParams());
         ToWebScoketParams twsp = JSON.parseObject(topic.getParams(), ToWebScoketParams.class);
 
         List<String> userList = topic.getUserList();
@@ -37,7 +39,7 @@ public class TopicService {
             List<Channel> channelList = ChannelUtil.getInstance().getAllChannel();
             for (Channel item : channelList) {
 //                item.writeAndFlush(vo);
-                item.writeAndFlush(twsp);
+                item.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(twsp)));
             }
         }
         if (CollectionUtil.isNotEmpty(userList)) {
@@ -46,7 +48,8 @@ public class TopicService {
                 Channel otherChannel = ChannelUtil.getInstance().getChannel(Long.valueOf(item));
                 if (otherChannel != null && otherChannel.isActive()) {
 //                    otherChannel.writeAndFlush(ResponseStompFactory.createOk(topic.getParams(), "schat"));
-                    otherChannel.writeAndFlush(twsp);
+//                    otherChannel.writeAndFlush(twsp);
+                    otherChannel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(twsp)));
                 }
             }
         } else if (CollectionUtil.isNotEmpty(enteList)) {
@@ -58,7 +61,7 @@ public class TopicService {
                     continue;
                 }
                 for (Channel channel : chalMap.values()) {
-                    channel.writeAndFlush(twsp);
+                    channel.writeAndFlush(new TextWebSocketFrame(JSON.toJSONString(twsp)));
 //                    channel.writeAndFlush(vo);
                 }
             }

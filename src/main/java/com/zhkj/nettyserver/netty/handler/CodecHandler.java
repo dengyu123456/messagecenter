@@ -1,18 +1,13 @@
 package com.zhkj.nettyserver.netty.handler;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.zhkj.nettyserver.common.base.request.Request;
 import com.zhkj.nettyserver.common.base.respone.ResponseStomp;
-import com.zhkj.nettyserver.message.domain.request.*;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageCodec;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Des:编码解码Handler
@@ -33,6 +28,7 @@ public class CodecHandler extends MessageToMessageCodec<TextWebSocketFrame, Resp
     @Override
     protected void encode(ChannelHandlerContext ctx, ResponseStomp rsto, List<Object> out) throws Exception {//编码
         out.add(new TextWebSocketFrame(JSON.toJSONString(rsto)));
+        System.out.println("编码");
     }
 
 }
