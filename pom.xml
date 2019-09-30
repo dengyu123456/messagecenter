@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.zhkj</groupId>
-	<artifactId>qy-nettyServer-api</artifactId>
+	<artifactId>nettyServer-api</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>qy-nettyServer-api</name>
+	<name>nettyServer-api</name>
 	<description>qy-purchase-api project for Spring Boot</description>
 
     <properties>
@@ -64,7 +64,7 @@
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>fastjson</artifactId>
-            <version>1.2.58</version>
+            <version>1.2.47</version>
         </dependency>
         <!--shiro-->
         <dependency>

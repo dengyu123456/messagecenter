@@ -17,20 +17,31 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChannelUtil {
 
     //公司层封装
-
+    //这里应该用ConcurrentHashMap的，不应该用hashMap
     private Map<Long, ConcurrentHashMap<Long, Channel>> echaMap = null;
-
 
     private ChannelUtil() {
         this.echaMap = new HashMap<>();
     }
 
-    private static class Holder {
-        private static final ChannelUtil instance = new ChannelUtil();
-    }
+//    private static class Holder {
+//        private static final ChannelUtil instance = new ChannelUtil();
+//    }
+//
+//    public static ChannelUtil getInstance() {
+//        return Holder.instance;
+//    }
+
+    private static volatile ChannelUtil instance = null;
 
     public static ChannelUtil getInstance() {
-        return Holder.instance;
+        if (instance == null) {
+            synchronized (ChannelUtil.class) {
+                instance = new ChannelUtil();
+                return instance;
+            }
+        }
+        return instance;
     }
 
     //建立会话，保存连接映射
@@ -42,6 +53,7 @@ public class ChannelUtil {
             echaMap.put(enteUuid, chalMap);
             channel.attr(Attributes.SESSION).set(suseUuid);
             channel.attr(Attributes.ENTE).set(enteUuid);
+
         } else if (suseUuid != null && channel != null) { //如果公司层级有
             echaMap.get(enteUuid).put(suseUuid, channel);
             channel.attr(Attributes.SESSION).set(suseUuid);
