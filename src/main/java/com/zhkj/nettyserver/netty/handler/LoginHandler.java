@@ -74,7 +74,7 @@ public class LoginHandler extends SimpleChannelInboundHandler<Object> {
      */
     private void handleHttpRequest(ChannelHandlerContext ctx, FullHttpRequest request) throws Exception {
 
-        // 如果HTTP解码失败，返回HTTP异常  升级握手
+        // 如果HTTP解码失败，返回HTTP异常
         if (!request.decoderResult().isSuccess() || (!"websocket".equals(request.headers().get("Upgrade")))) {//
             sendHttpResponse(ctx, request, new DefaultFullHttpResponse(HTTP_1_1, BAD_REQUEST));
             return;
@@ -92,6 +92,7 @@ public class LoginHandler extends SimpleChannelInboundHandler<Object> {
                 TokenVO vo = TokenUtil.getToken(tokenStr);
                 if (vo == null) {
                     sendHttpResponse(ctx, request, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.UNAUTHORIZED));
+                    //token验证，这里写你们自己项目的token验证规则
                 } else if (vo.getOt() < System.currentTimeMillis() || (vo.getOt()-System.currentTimeMillis()) > 604800000) {
                     sendHttpResponse(ctx, request, new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.FORBIDDEN));
                 } else {//没有问题

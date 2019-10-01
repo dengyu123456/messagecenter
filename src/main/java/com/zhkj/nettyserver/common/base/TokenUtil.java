@@ -19,19 +19,6 @@ import com.zhkj.nettyserver.common.util.Base64Util;
  * Time: 16:27
  */
 public class TokenUtil {
-//    public static String gen(SystemUser user){
-//        TokenVO tokenVO = new TokenVO();
-//        tokenVO.setUuid(String.valueOf(user.getSuseUuid()));
-//        tokenVO.setTag(user.getSuseOnlineTag());
-//        tokenVO.setRole("");
-//        tokenVO.setAuth("");
-//        long curTime = System.currentTimeMillis();
-//        tokenVO.setSt(curTime);
-//        tokenVO.setOt(curTime+7*24*60*60*1000);
-//        tokenVO.setSalt(user.getSuseClientSalt());
-//        return Base64Util.encodeToString(AESUtil.encrytor(JSONObject.toJSONString(tokenVO)).getBytes());
-//    }
-
     /**
      * 通过token获取uuid
      * @param token

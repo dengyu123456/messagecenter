@@ -17,7 +17,6 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChannelUtil {
 
     //公司层封装
-    //这里应该用ConcurrentHashMap的，不应该用hashMap
     private Map<Long, ConcurrentHashMap<Long, Channel>> echaMap = null;
 
     private ChannelUtil() {
@@ -104,7 +103,7 @@ public class ChannelUtil {
         return null;
     }
 
-    //获取所有管道
+    //获取所有管道组
     public ChannelGroup getChannelGroup(ChannelHandlerContext ctx) {
         ChannelGroup channelGroup = new DefaultChannelGroup(ctx.executor());
         for (ConcurrentHashMap<Long, Channel> chalMap : echaMap.values()) {

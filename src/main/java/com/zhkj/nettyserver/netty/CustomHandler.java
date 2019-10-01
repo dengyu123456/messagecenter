@@ -30,7 +30,7 @@ import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 /**
  * @author dengyi
  * time:2019年6月11日 10:31:17
- * 自定义的Handler  多个channel共享handler
+ * 自定义的Handler  多个channel共享handler   这个版本大量的if—else
  */
 public class CustomHandler extends SimpleChannelInboundHandler<Object> {
 

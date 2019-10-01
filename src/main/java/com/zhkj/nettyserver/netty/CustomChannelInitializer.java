@@ -30,7 +30,7 @@ public class CustomChannelInitializer extends ChannelInitializer {
         pipeline.addLast("login",new LoginHandler()); //登录
         pipeline.addLast("Authen",new AuthenHandler());//认证
         pipeline.addLast("codec",new CodecHandler());//编码解码
-        pipeline.addLast("split",new SpliterHandler());//分发
+        pipeline.addLast("split",SpliterHandler.getInstance());//分发
 
     }
 }

@@ -7,6 +7,11 @@
  */
 package com.zhkj.nettyserver.common.base.request;
 
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
+
 /**
  * Des: 请求参数的统一对象
  * ClassName: Request
@@ -56,4 +61,5 @@ public class Request {
         this.action = action;
     }
 
+   
 }

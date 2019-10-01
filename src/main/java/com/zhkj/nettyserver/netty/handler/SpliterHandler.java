@@ -17,12 +17,23 @@ import java.util.Map;
  */
 public class SpliterHandler extends SimpleChannelInboundHandler<Request> {
 
-    private  Map<String, SimpleChannelInboundHandler> handlerMap;
+    private static Map<String, SimpleChannelInboundHandler> handlerMap = null;
 
     //解码映射表
     Map<String, Class> codecMap = null;
+    private static volatile SpliterHandler instance = null;
 
-    public SpliterHandler() {
+    public static SpliterHandler getInstance() {
+        if (instance == null) {
+            synchronized (SpliterHandler.class) {
+                instance = new SpliterHandler();
+                return instance;
+            }
+        }
+        return instance;
+    }
+
+    private SpliterHandler() {
         handlerMap = new HashMap<>();
 
         handlerMap.put("chat", new ChatHandler());

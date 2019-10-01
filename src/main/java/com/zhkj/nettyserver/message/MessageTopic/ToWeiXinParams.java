@@ -1,4 +1,4 @@
-package com.zhkj.nettyserver.message.domain.MessageTopic;
+package com.zhkj.nettyserver.message.MessageTopic;
 
 import com.zhkj.nettyserver.weixin.domain.SendTemplateMsgParams;
 

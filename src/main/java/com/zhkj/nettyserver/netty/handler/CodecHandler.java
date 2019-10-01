@@ -28,7 +28,6 @@ public class CodecHandler extends MessageToMessageCodec<TextWebSocketFrame, Resp
     @Override
     protected void encode(ChannelHandlerContext ctx, ResponseStomp rsto, List<Object> out) throws Exception {//编码
         out.add(new TextWebSocketFrame(JSON.toJSONString(rsto)));
-        System.out.println("编码");
     }
 
 }

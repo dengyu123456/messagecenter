@@ -1,4 +1,4 @@
-package com.zhkj.nettyserver.message.domain.MessageTopic;
+package com.zhkj.nettyserver.message.MessageTopic;
 
 
 import java.util.List;

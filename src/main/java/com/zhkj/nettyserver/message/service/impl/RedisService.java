@@ -10,7 +10,7 @@ package com.zhkj.nettyserver.message.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.zhkj.nettyserver.common.util.redis.CustomPubSub;
 import com.zhkj.nettyserver.common.util.redis.RedisUtil;
-import com.zhkj.nettyserver.message.domain.MessageTopic.Topic;
+import com.zhkj.nettyserver.message.MessageTopic.Topic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;

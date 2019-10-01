@@ -2,8 +2,8 @@ package com.zhkj.nettyserver.message.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.zhkj.nettyserver.common.util.CollectionUtil;
-import com.zhkj.nettyserver.message.domain.MessageTopic.ToWebScoketParams;
-import com.zhkj.nettyserver.message.domain.MessageTopic.Topic;
+import com.zhkj.nettyserver.message.MessageTopic.ToWebScoketParams;
+import com.zhkj.nettyserver.message.MessageTopic.Topic;
 import com.zhkj.nettyserver.netty.ChannelUtil;
 import com.zhkj.nettyserver.weixin.WeiXin;
 import io.netty.channel.Channel;

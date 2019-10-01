@@ -1,4 +1,4 @@
-package com.zhkj.nettyserver.message.domain.MessageTopic;
+package com.zhkj.nettyserver.message.MessageTopic;
 
 /**
  * Des:发送到webscoket参数
