@@ -221,6 +221,7 @@ public class RedisUtil {
         Jedis jedis = null;
         try {
             jedis = jedisPool.getResource();
+            //psubscribe按照模式订阅，也就是可以用通配符指定订阅 比如topic*
             jedis.psubscribe(pubSub, channel);
         }catch (Exception e){
             LOGGER.error(e.getMessage(),e.getStackTrace());

@@ -34,17 +34,17 @@ import java.util.List;
 @Service("messageService")
 public class MessageServiceImpl implements MessageService {
 
-    @Autowired
+    @Autowired(required = false)
     private ChatUserMapper chatUserMapper;
-    @Autowired
+    @Autowired(required = false)
     private ChatMapper chatMapper;
-    @Autowired
+    @Autowired(required = false)
     private MessageMapper messageMapper;
-    @Autowired
+    @Autowired(required = false)
     private UserMapper userMapper;
-    @Autowired
+    @Autowired(required = false)
     private ChatGroupMapper chatGroupMapper;
-    @Autowired
+    @Autowired(required = false)
     private ChatGroupUserMapper chatGroupUserMapper;
 
     /**
